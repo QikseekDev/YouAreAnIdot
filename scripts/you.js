@@ -14,11 +14,9 @@ document.addEventListener('click', function playMusicOnce() {
         micon.src = "images/speakerm.png";
     }
 
-    // Remove the document-level listener after first user click (required by browsers)
     document.removeEventListener('click', playMusicOnce);
 }, { once: true });
 
-// Looping background audio with a small buffer
 const faudio = new Audio('youare.mp3');
 faudio.addEventListener('timeupdate', function () {
     if (this.currentTime > this.duration - 0.45) {
@@ -27,41 +25,78 @@ faudio.addEventListener('timeupdate', function () {
     }
 });
 
-/* ================= Bookmark (IE only) ================= */
+/* ================= Bookmark (IE) ================= */
 function bookmark() {
     if (navigator.appName === "Microsoft Internet Explorer" && parseInt(navigator.appVersion) >= 4) {
         window.external.AddFavorite("lol.html", "‎‎Idiot!");
     }
 }
 
-/* ================= Window Movement ================= */
-let xOff = 5, yOff = 5;
-let xPos = 400, yPos = -100;
-let flagRun = 1;
+/* ================= Popup Tracking ================= */
+const openWindows = [];
+let orbitMode = false;
+let mouseX = 0;
+let mouseY = 0;
+let orbitAngle = 0;
 
-const openWindows = []; // Track all popups
+/* Track mouse position */
+document.addEventListener("mousemove", e => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+});
 
+/* ========= 3D DEPTH ORBIT MODE ========= */
+function orbitLoop() {
+    if (!orbitMode) return;
+
+    orbitAngle += 0.05;
+
+    const baseRadius = 200;
+    const depthRange = 120; 
+    const maxScale = 1.4;
+    const minScale = 0.6;
+
+    openWindows.forEach((w, i) => {
+        if (!w || w.closed) return;
+
+        const localAngle = orbitAngle + (i * (Math.PI * 2 / openWindows.length));
+        const depth = Math.sin(localAngle);
+        const speedBoost = 1 + depth * 0.25;
+        const effectiveAngle = orbitAngle * speedBoost + i;
+        const radius = baseRadius + depth * depthRange;
+        const x = mouseX + Math.cos(effectiveAngle) * radius;
+        const y = mouseY + Math.sin(effectiveAngle) * radius;
+
+        try {
+            w.moveTo(x, y);
+            w.document.body.style.transformOrigin = "center center";
+            w.document.body.style.transform = `scale(${minScale + ((depth + 1) / 2) * (maxScale - minScale)})`;
+            w.document.body.style.opacity = 0.4 + ((depth + 1) / 2) * 0.6;
+        } catch (e) {}
+    });
+
+    requestAnimationFrame(orbitLoop);
+}
+
+/* ================= Window Controls ================= */
 function openWindow(url) {
     const width = 357;
     const height = 330;
     const left = Math.floor((screen.width - width) / 2);
     const top = Math.floor((screen.height - height) / 2);
-
-    const features = `menubar=no,status=no,toolbar=no,resizable=no,width=${width},height=${height},left=${left},top=${top},noopener,noreferrer`;
+    const features = `menubar=no,status=no,toolbar=no,resizable=no,
+        width=${width},height=${height},left=${left},top=${top},
+        noopener,noreferrer`;
 
     const aWindow = window.open(url, "_blank", features);
-
     if (aWindow) {
         openWindows.push(aWindow);
+        aWindow.opener = window; // Ensure popup can reference main window
 
-        // Monitor for closure
         const timer = setInterval(() => {
-            // Remove closed windows
             for (let i = openWindows.length - 1; i >= 0; i--) {
                 if (openWindows[i].closed) openWindows.splice(i, 1);
             }
-
-            // When this specific window closes, spawn duplicates
             if (aWindow.closed) {
                 clearInterval(timer);
                 const countToOpen = Math.max(1, openWindows.length);
@@ -79,7 +114,32 @@ function proCreate() {
     }
 }
 
-// Random direction changes
+function closeAllPopups() {
+    openWindows.forEach(w => {
+        try { w.close(); } catch (e) {}
+    });
+    openWindows.length = 0;
+}
+
+function toggleOrbit() {
+    orbitMode = !orbitMode;
+    if (orbitMode) orbitLoop();
+    else {
+        openWindows.forEach(w => {
+            try {
+                w.document.body.style.transform = "scale(1)";
+                w.document.body.style.opacity = "1";
+            } catch(e) {}
+        });
+        playBall();
+    }
+}
+
+/* ================= Window Movement ================= */
+let xOff = 5, yOff = 5;
+let xPos = 400, yPos = -100;
+let flagRun = 1;
+
 function newXlt() { xOff = Math.ceil(-6 * Math.random()) * 5 - 10; window.focus(); }
 function newXrt() { xOff = Math.ceil(7 * Math.random()) * 5 - 10; window.focus(); }
 function newYup() { yOff = Math.ceil(-6 * Math.random()) * 5 - 10; window.focus(); }
@@ -87,8 +147,8 @@ function newYdn() { yOff = Math.ceil(7 * Math.random()) * 5 - 10; window.focus()
 
 function fOff() { flagRun = 0; }
 
-// Main bouncing logic
 function playBall() {
+    if (orbitMode) return;
     xPos += xOff;
     yPos += yOff;
 
@@ -98,21 +158,32 @@ function playBall() {
     if (yPos < 0) newYdn();
 
     if (flagRun === 1) {
-        try {
-            window.moveTo(xPos, yPos);
-        } catch (e) {
-            console.warn("Window movement blocked by browser.");
-            flagRun = 0;
-        }
-        setTimeout(playBall, 16); // ~60fps for smooth movement
+        try { window.moveTo(xPos, yPos); } catch (e) { flagRun = 0; }
+        setTimeout(playBall, 16);
     }
+}
+
+/* ================= Keyboard Shortcuts ================= */
+// Works from main window
+document.addEventListener("keydown", (e) => {
+    if (e.key.toLowerCase() === "o") toggleOrbit();
+    if (e.key.toLowerCase() === "f") closeAllPopups();
+});
+
+// Allow popups to trigger the same actions via main window
+if (window.opener) {
+    document.addEventListener("keydown", (e) => {
+        if (!window.opener) return;
+        if (e.key.toLowerCase() === "o") window.opener.toggleOrbit();
+        if (e.key.toLowerCase() === "f") window.opener.closeAllPopups();
+    });
 }
 
 /* ================= Window Events ================= */
 window.onload = function () {
     flagRun = 1;
     playBall();
-    bookmark(); // IE only
+    bookmark();
 };
 
 window.onmouseout = function () {
@@ -120,12 +191,12 @@ window.onmouseout = function () {
 };
 
 window.oncontextmenu = function () {
-    return false; // Disable right-click
+    return false;
 };
 
 window.onkeydown = function (event) {
     const keyCode = event.keyCode;
-    if ([17, 18, 46, 115].includes(keyCode)) { // Ctrl, Alt, Delete, F4
+    if ([17, 18, 46, 115].includes(keyCode)) {
         proCreate();
     }
 };
