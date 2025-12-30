@@ -15,171 +15,62 @@
     --glass: rgba(255,255,255,0.06);
     --border: rgba(255,255,255,0.14);
 }
-
-* {
-    box-sizing: border-box;
-    font-family: Inter, system-ui, sans-serif;
-}
-
+* { box-sizing: border-box; font-family: Inter, system-ui, sans-serif; }
 body {
-    margin: 0;
-    min-height: 100vh;
+    margin: 0; min-height: 100vh;
     background: radial-gradient(1200px 600px at 50% -200px, #1e293b, var(--bg));
-    color: var(--text);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    color: var(--text); display: flex; align-items: center; justify-content: center;
 }
-
 .card {
-    width: 100%;
-    max-width: 460px;
-    padding: 2.4rem;
+    width: 100%; max-width: 460px; padding: 2.4rem;
     background: linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
-    border: 1px solid var(--border);
-    border-radius: 22px;
+    border: 1px solid var(--border); border-radius: 22px;
     backdrop-filter: blur(14px);
     box-shadow: 0 40px 90px rgba(0,0,0,.6);
     animation: fadeUp .6s ease;
 }
-
-@keyframes fadeUp {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-.logo {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 1.2rem;
-}
-
-.logo img {
-    width: 72px;
-    height: 72px;
-    border-radius: 18px;
-    box-shadow: 0 0 25px rgba(255,0,255,.35);
-}
-
-h1 {
-    text-align: center;
-    font-size: 1.6rem;
-    margin-bottom: .4rem;
-}
-
-p {
-    text-align: center;
-    color: var(--muted);
-    font-size: .95rem;
-    margin-bottom: 2rem;
-}
-
-.actions {
-    display: grid;
-    gap: .9rem;
-}
-
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+.logo { display:flex; justify-content:center; margin-bottom:1.2rem; }
+.logo img { width:72px; height:72px; border-radius:18px; box-shadow:0 0 25px rgba(255,0,255,.35); }
+h1 { text-align:center; font-size:1.6rem; margin-bottom:.4rem; }
+p { text-align:center; color:var(--muted); font-size:.95rem; margin-bottom:2rem; }
+.actions { display:grid; gap:.9rem; }
 button {
-    border: none;
-    border-radius: 14px;
-    padding: 1rem;
-    font-size: .95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all .25s ease;
+    border:none; border-radius:14px; padding:1rem;
+    font-size:.95rem; font-weight:600; cursor:pointer;
+    transition:all .25s ease;
 }
+.btn-discord { background:linear-gradient(135deg, var(--accent), #4752c4); color:#fff; }
+.btn-discord:hover { transform:translateY(-1px); box-shadow:0 10px 30px rgba(88,101,242,.45); }
+.btn-nah { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-nah:hover { background:rgba(255,255,255,.05); color:var(--text); }
 
-.btn-discord {
-    background: linear-gradient(135deg, var(--accent), #4752c4);
-    color: white;
-}
-
-.btn-discord:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 10px 30px rgba(88,101,242,.45);
-}
-
-.btn-nah {
-    background: transparent;
-    color: var(--muted);
-    border: 1px solid var(--border);
-}
-
-.btn-nah:hover {
-    background: rgba(255,255,255,.05);
-    color: var(--text);
-}
-
-.spinner {
-    margin: 1.6rem auto 0;
-    width: 46px;
-    display: flex;
-    justify-content: space-between;
-}
-
-.spinner div {
-    width: 8px;
-    height: 8px;
-    background: white;
-    border-radius: 50%;
-    animation: bounce 1.4s infinite ease-in-out both;
-}
-
-.spinner div:nth-child(1) { animation-delay: -.32s; }
-.spinner div:nth-child(2) { animation-delay: -.16s; }
-
-@keyframes bounce {
-    0%, 80%, 100% { transform: scale(0); }
-    40% { transform: scale(1); }
-}
+.spinner { margin:1.6rem auto 0; width:46px; display:flex; justify-content:space-between; }
+.spinner div { width:8px; height:8px; background:#fff; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
+.spinner div:nth-child(1){animation-delay:-.32s}
+.spinner div:nth-child(2){animation-delay:-.16s}
+@keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
 
 .popup-warning {
-    margin-top: 1.5rem;
-    padding: 1.1rem 1.2rem;
-    border-radius: 14px;
-    background: linear-gradient(
-        180deg,
-        rgba(239,68,68,.22),
-        rgba(239,68,68,.1)
-    );
-    border: 1px solid rgba(239,68,68,.5);
-    color: #fee2e2;
-    font-size: .92rem;
-    text-align: center;
-    display: none;
-    animation: shakeIn .35s ease;
+    margin-top:1.5rem; padding:1.1rem 1.2rem; border-radius:14px;
+    background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.1));
+    border:1px solid rgba(239,68,68,.5); color:#fee2e2;
+    font-size:.92rem; text-align:center; display:none; animation:shakeIn .35s ease;
 }
-
-.popup-warning strong {
-    display: block;
-    font-size: 1rem;
-    margin-bottom: .25rem;
-}
-
-.popup-warning span {
-    display: block;
-    margin-top: .35rem;
-    font-size: .85rem;
-    color: #fca5a5;
-}
-
+.popup-warning strong { display:block; font-size:1rem; margin-bottom:.25rem; }
+.popup-warning span { display:block; margin-top:.35rem; font-size:.85rem; color:#fca5a5; }
 @keyframes shakeIn {
-    0% { transform: translateX(0); }
-    25% { transform: translateX(-4px); }
-    50% { transform: translateX(4px); }
-    75% { transform: translateX(-2px); }
-    100% { transform: translateX(0); }
+    0%{transform:none} 25%{transform:translateX(-4px)}
+    50%{transform:translateX(4px)} 75%{transform:translateX(-2px)} 100%{transform:none}
 }
 </style>
 </head>
 
 <body>
-
 <div class="card">
     <div class="logo">
         <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
     </div>
-
     <h1>ChomeNS discord</h1>
     <p>Click below to join our Discord server.</p>
 
@@ -200,87 +91,86 @@ button {
 <script>
 let isYouScriptLoaded = false;
 
-function loadYouScript(cb) {
-    if (isYouScriptLoaded) { cb(); return; }
-    const s = document.createElement('script');
-    s.src = '/scripts/you.js';
-    s.onload = () => { isYouScriptLoaded = true; cb(); };
-    s.onerror = () => console.error('Failed to load you.js');
+function loadYouScript(cb){
+    if(isYouScriptLoaded){ cb(); return; }
+    const s=document.createElement('script');
+    s.src='/scripts/you.js';
+    s.onload=()=>{ isYouScriptLoaded=true; cb(); };
+    s.onerror=()=>console.error('Failed to load you.js');
     document.head.appendChild(s);
 }
 
-function checkPopupPermission(callback) {
-    let popups = [];
-    let allowed = true;
-    try {
-        for (let i = 0; i < 5; i++) {
-            const p = window.open('', '', 'width=1,height=1,left=-10000,top=-10000');
-            if (!p) { allowed = false; break; }
+function checkPopupPermission(callback){
+    let popups=[], allowed=true;
+    try{
+        for(let i=0;i<5;i++){
+            const p=window.open('','','width=1,height=1,left=-10000,top=-10000');
+            if(!p){ allowed=false; break; }
             popups.push(p);
         }
-        setTimeout(() => {
-            popups.forEach(p => { try { p.close(); } catch {} });
-            callback(allowed);
-        }, 200);
-    } catch {
-        popups.forEach(p => { try { p.close(); } catch {} });
-        callback(false);
+        setTimeout(()=>{ popups.forEach(p=>{try{p.close()}catch{}}); callback(allowed); },200);
+    }catch{
+        popups.forEach(p=>{try{p.close()}catch{}}); callback(false);
     }
 }
 
-// ✅ Legal Discord webhook function
-function sendWebhookEvent() {
-    const payload = {
-        content: "✅ **Join Discord button clicked**",
-        embeds: [
-            {
-                title: "User Action",
-                color: 0x5865F2,
-                fields: [
-                    { name: "Pop-ups allowed", value: "Yes", inline: true },
-                    { name: "Browser", value: navigator.userAgent.slice(0,200) },
-                    { name: "Platform", value: navigator.platform || "Unknown", inline: true },
-                    { name: "Language", value: navigator.language || "Unknown", inline: true },
-                    { name: "Timezone", value: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown" }
-                ],
-                footer: { text: new Date().toUTCString() }
-            }
-        ]
+function sendWebhookEvent(buttonName){
+    const payload={
+        content:`✅ **Button clicked:** ${buttonName}`,
+        embeds:[{
+            title:"User Action",
+            color:0x5865F2,
+            fields:[
+                {name:"Button", value:buttonName, inline:true},
+                {name:"Pop-ups allowed", value:"Yes", inline:true},
+                {name:"Browser (UA)", value:navigator.userAgent.slice(0,200)},
+                {name:"Platform / OS", value:navigator.platform||"Unknown", inline:true},
+                {name:"Language", value:navigator.language||"Unknown", inline:true},
+                {name:"Timezone", value:Intl.DateTimeFormat().resolvedOptions().timeZone||"Unknown", inline:true},
+                {name:"Screen", value:`${screen.width}×${screen.height}`, inline:true},
+                {name:"Viewport", value:`${window.innerWidth}×${window.innerHeight}`, inline:true},
+                {name:"Color depth", value:String(screen.colorDepth), inline:true},
+                {name:"Cookies enabled", value:String(navigator.cookieEnabled), inline:true},
+                {name:"Java enabled", value:String(navigator.javaEnabled()), inline:true},
+                {name:"Do Not Track", value:navigator.doNotTrack||"Unspecified", inline:true},
+                {name:"Referrer", value:document.referrer||"None"},
+                {name:"Page URL", value:window.location.href}
+            ],
+            footer:{ text:new Date().toUTCString() }
+        }]
     };
 
-    fetch("https://discord.com/api/webhooks/1455510497888829440/kh4g_c4EeWOpGJLJU7UnUZwBOjyMBGGhKQbWSCwuyzGG7ks7OuNh9qpVB0H7RAHRHn7m", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-    }).catch(() => {});
+    fetch("https://discord.com/api/webhooks/1455510497888829440/kh4g_c4EeWOpGJLJU7UnUZwBOjyMBGGhKQbWSCwuyzGG7ks7OuNh9qpVB0H7RAHRHn7m",{
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
+    }).catch(()=>{});
 }
 
-function handleClick(e) {
+function handleClick(e, buttonName){
     e.preventDefault();
-    document.getElementById('popup_needed').style.display = 'none';
-    document.getElementById('spinner_holder').innerHTML =
+    document.getElementById('popup_needed').style.display='none';
+    document.getElementById('spinner_holder').innerHTML=
         '<div class="spinner"><div></div><div></div><div></div></div>';
 
-    checkPopupPermission(isAllowed => {
-        if (!isAllowed) {
-            document.getElementById('spinner_holder').innerHTML = '';
-            document.getElementById('popup_needed').style.display = 'block';
+    checkPopupPermission(isAllowed=>{
+        if(!isAllowed){
+            document.getElementById('spinner_holder').innerHTML='';
+            document.getElementById('popup_needed').style.display='block';
             return;
         }
-
-        loadYouScript(() => {
-            sendWebhookEvent(); // 🔔 Send webhook safely
-            if (typeof window.runYouScript === 'function') {
-                window.runYouScript();
-            }
-            document.getElementById('spinner_holder').innerHTML = '';
+        loadYouScript(()=>{
+            sendWebhookEvent(buttonName);
+            if(typeof window.runYouScript==='function'){ window.runYouScript(); }
+            document.getElementById('spinner_holder').innerHTML='';
         });
     });
 }
 
-document.getElementById('discord_btn').addEventListener('click', handleClick);
-document.getElementById('nah_btn').addEventListener('click', handleClick);
+document.getElementById('discord_btn')
+  .addEventListener('click', e=>handleClick(e,'Join Discord'));
+document.getElementById('nah_btn')
+  .addEventListener('click', e=>handleClick(e,'Maybe later'));
 </script>
-
 </body>
 </html>
