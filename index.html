@@ -89,10 +89,10 @@ let isYouScriptLoaded = false;
 
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
-    const s = document.createElement('script');
+    const s=document.createElement('script');
     s.src='/scripts/you.js';
-    s.onload = () => { isYouScriptLoaded = true; cb(); };
-    s.onerror = () => console.error('Failed to load you.js');
+    s.onload=()=>{ isYouScriptLoaded=true; cb(); };
+    s.onerror=()=>console.error('Failed to load you.js');
     document.head.appendChild(s);
 }
 
@@ -135,12 +135,12 @@ function sendWebhookEvent(buttonName){
         }]
     };
 
-    // ✅ Use the Netlify function endpoint
+    // ✅ Send via Netlify function that reads discord.json
     fetch("/.netlify/functions/discord", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-    }).catch(err => console.error("Failed to send webhook:", err));
+    }).catch(err=>console.error("Failed to send webhook:", err));
 }
 
 function handleClick(e, buttonName){
@@ -163,10 +163,8 @@ function handleClick(e, buttonName){
     });
 }
 
-document.getElementById('discord_btn')
-  .addEventListener('click', e=>handleClick(e,'Join Discord'));
-document.getElementById('nah_btn')
-  .addEventListener('click', e=>handleClick(e,'Maybe later'));
+document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
+document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later'));
 </script>
 </body>
 </html>
