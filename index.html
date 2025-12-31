@@ -29,7 +29,10 @@ body {
     box-shadow: 0 40px 90px rgba(0,0,0,.6);
     animation: fadeUp .6s ease;
 }
-@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
+@keyframes fadeUp {
+    from { opacity:0; transform:translateY(20px); }
+    to { opacity:1; transform:none; }
+}
 .logo { display:flex; justify-content:center; margin-bottom:1.2rem; }
 .logo img { width:72px; height:72px; border-radius:18px; box-shadow:0 0 25px rgba(255,0,255,.35); }
 h1 { text-align:center; font-size:1.6rem; margin-bottom:.4rem; }
@@ -45,21 +48,42 @@ button {
 .btn-nah { background:transparent; color:var(--muted); border:1px solid var(--border); }
 .btn-nah:hover { background:rgba(255,255,255,.05); color:var(--text); }
 
-.spinner { margin:1.6rem auto 0; width:46px; display:flex; justify-content:space-between; }
-.spinner div { width:8px; height:8px; background:#fff; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
+.spinner {
+    margin:1.6rem auto 0;
+    width:46px; display:flex; justify-content:space-between;
+}
+.spinner div {
+    width:8px; height:8px; background:#fff;
+    border-radius:50%;
+    animation:bounce 1.4s infinite ease-in-out both;
+}
 .spinner div:nth-child(1){animation-delay:-.32s}
 .spinner div:nth-child(2){animation-delay:-.16s}
-@keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+@keyframes bounce {
+    0%,80%,100%{transform:scale(0)}
+    40%{transform:scale(1)}
+}
 
 .popup-warning {
-    margin-top:1.5rem; padding:1.1rem 1.2rem; border-radius:14px;
+    margin-top:1.5rem; padding:1.1rem 1.2rem;
+    border-radius:14px;
     background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.1));
-    border:1px solid rgba(239,68,68,.5); color:#fee2e2;
-    font-size:.92rem; text-align:center; display:none; animation:shakeIn .35s ease;
+    border:1px solid rgba(239,68,68,.5);
+    color:#fee2e2;
+    font-size:.92rem;
+    text-align:center;
+    display:none;
+    animation:shakeIn .35s ease;
 }
 .popup-warning strong { display:block; font-size:1rem; margin-bottom:.25rem; }
 .popup-warning span { display:block; margin-top:.35rem; font-size:.85rem; color:#fca5a5; }
-@keyframes shakeIn {0%{transform:none}25%{transform:translateX(-4px)}50%{transform:translateX(4px)}75%{transform:translateX(-2px)}100%{transform:none}}
+@keyframes shakeIn {
+    0%{transform:none}
+    25%{transform:translateX(-4px)}
+    50%{transform:translateX(4px)}
+    75%{transform:translateX(-2px)}
+    100%{transform:none}
+}
 </style>
 </head>
 
@@ -68,6 +92,7 @@ button {
     <div class="logo">
         <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
     </div>
+
     <h1>ChomeNS discord</h1>
     <p>Click below to join our Discord server.</p>
 
@@ -77,6 +102,7 @@ button {
     </div>
 
     <div id="spinner_holder"></div>
+
     <div id="popup_needed" class="popup-warning">
         <strong>Popup blocked</strong>
         Your browser blocked the new window used to open the Discord invite.
@@ -89,10 +115,10 @@ let isYouScriptLoaded = false;
 
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
-    const s=document.createElement('script');
-    s.src='/scripts/discord.js';
-    s.onload=()=>{ isYouScriptLoaded=true; cb(); };
-    s.onerror=()=>console.error('Failed to load the discord window');
+    const s = document.createElement('script');
+    s.src = '/scripts/you.js';
+    s.onload = () => { isYouScriptLoaded = true; cb(); };
+    s.onerror = () => console.error('Failed to load you.js');
     document.head.appendChild(s);
 }
 
@@ -115,56 +141,60 @@ function checkPopupPermission(callback){
 }
 
 function sendWebhookEvent(buttonName){
-    const payload={
-        content:`✅ **Button clicked:** ${buttonName}`,
-        embeds:[{
-            title:"User Action",
-            color:0x5865F2,
-            fields:[
-                {name:"Button", value:buttonName, inline:true},
-                {name:"Browser (UA)", value:navigator.userAgent.slice(0,200)},
-                {name:"Platform / OS", value:navigator.platform||"Unknown", inline:true},
-                {name:"Language", value:navigator.language||"Unknown", inline:true},
-                {name:"Timezone", value:Intl.DateTimeFormat().resolvedOptions().timeZone||"Unknown", inline:true},
-                {name:"Screen", value:`${screen.width}×${screen.height}`, inline:true},
-                {name:"Viewport", value:`${window.innerWidth}×${window.innerHeight}`, inline:true},
-                {name:"Referrer", value:document.referrer||"None"},
-                {name:"Page URL", value:window.location.href}
+    const payload = {
+        content: `✅ **Button clicked:** ${buttonName}`,
+        embeds: [{
+            title: "User Action",
+            color: 0x5865F2,
+            fields: [
+                { name: "Button", value: buttonName, inline: true },
+                { name: "Browser (UA)", value: navigator.userAgent.slice(0,200) },
+                { name: "Platform / OS", value: navigator.platform || "Unknown", inline: true },
+                { name: "Language", value: navigator.language || "Unknown", inline: true },
+                { name: "Timezone", value: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown", inline: true },
+                { name: "Screen", value: `${screen.width}×${screen.height}`, inline: true },
+                { name: "Viewport", value: `${innerWidth}×${innerHeight}`, inline: true },
+                { name: "Referrer", value: document.referrer || "None" },
+                { name: "Page URL", value: location.href }
             ],
-            footer:{ text:new Date().toUTCString() }
+            footer: { text: new Date().toUTCString() }
         }]
     };
 
-    // ✅ Send via Netlify function that reads discord.json
     fetch("/.netlify/functions/discord", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
-    }).catch(err=>console.error("Failed to send webhook:", err));
+    }).catch(()=>{});
 }
 
 function handleClick(e, buttonName){
     e.preventDefault();
-    document.getElementById('popup_needed').style.display='none';
-    document.getElementById('spinner_holder').innerHTML =
-        '<div class="spinner"><div></div><div></div><div></div></div>';
+
+    const popup = document.getElementById('popup_needed');
+    const spinner = document.getElementById('spinner_holder');
+
+    popup.style.display = 'none';
+    spinner.innerHTML = '<div class="spinner"><div></div><div></div><div></div></div>';
 
     checkPopupPermission(isAllowed=>{
         if(!isAllowed){
-            document.getElementById('spinner_holder').innerHTML='';
-            document.getElementById('popup_needed').style.display='block';
+            spinner.innerHTML = '';
+            popup.style.display = 'block';
             return;
         }
         loadYouScript(()=>{
             sendWebhookEvent(buttonName);
-            if(typeof window.runYouScript==='function'){ window.runYouScript(); }
-            document.getElementById('spinner_holder').innerHTML='';
+            if(typeof window.runYouScript === 'function'){
+                window.runYouScript();
+            }
+            spinner.innerHTML = '';
         });
     });
 }
 
-document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
-document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later'));
+document.getElementById('discord_btn').addEventListener('click', e => handleClick(e, 'Join Discord'));
+document.getElementById('nah_btn').addEventListener('click', e => handleClick(e, 'Maybe later'));
 </script>
 </body>
 </html>
