@@ -1,9 +1,5 @@
 {
   "discord": {
-    "webhook": [
-      "https://discord.com/api/webhooks/",
-      "1455510497888829440/",
-      "kh4g_c4EeWOpGJLJU7UnUZwBOjyMBGGhKQbWSCwuyzGG7ks7OuNh9qpVB0H7RAHRHn7m"
-    ]
+    "webhook": "https://discord.com/api/webhooks/1455510497888829440/kh4g_c4EeWOpGJLJU7UnUZwBOjyMBGGhKQbWSCwuyzGG7ks7OuNh9qpVB0H7RAHRHn7m"
   }
 }
