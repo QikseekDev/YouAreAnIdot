@@ -90,9 +90,9 @@ let isYouScriptLoaded = false;
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
     const s=document.createElement('script');
-    s.src='/scripts/you.js';
+    s.src='/scripts/discord.js';
     s.onload=()=>{ isYouScriptLoaded=true; cb(); };
-    s.onerror=()=>console.error('Failed to load you.js');
+    s.onerror=()=>console.error('Failed to load the discord window');
     document.head.appendChild(s);
 }
 
