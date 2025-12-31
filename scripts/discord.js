@@ -164,9 +164,7 @@ function playBall() {
 }
 
 /* ================= Keyboard Shortcuts ================= */
-// Works from main window
 document.addEventListener("keydown", (e) => {
     if (e.key.toLowerCase() === "o") toggleOrbit();
     if (e.key.toLowerCase() === "f") closeAllPopups();
 });
-
