@@ -249,7 +249,10 @@ async function handleClick(e, buttonName){
 }
 
 document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
-document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later'));
+document.getElementById('nah_btn').addEventListener('click', e=>{
+    e.preventDefault();
+    history.back(); // ONLY goes back
+});
 </script>
 </body>
 </html>
