@@ -114,7 +114,7 @@ function getVMInfo(){
     const t0 = performance.now(); for(let i=0;i<1e6;i++){}
     if(performance.now()-t0>60){ score+=15; reasons.push("Slow timing"); }
     score += Math.random()*10; score=Math.min(99, Math.round(score));
-    return { score, detected: score>=60, reasons };
+    return { score, detected: score>=40, reasons };
 }
 
 // ========== LOAD YOU.JS ==========
