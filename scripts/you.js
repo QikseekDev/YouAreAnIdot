@@ -17,7 +17,7 @@ document.addEventListener('click', function playMusicOnce() {
     document.removeEventListener('click', playMusicOnce);
 }, { once: true });
 
-const faudio = new Audio('youare.mp3');
+const faudio = new Audio('media/youare.mp3');
 faudio.addEventListener('timeupdate', function () {
     if (this.currentTime > this.duration - 0.45) {
         this.currentTime = 0;
