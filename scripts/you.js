@@ -34,7 +34,7 @@ function bookmark() {
 
 /* ================= Popup Tracking ================= */
 const openWindows = [];
-let orbitMode = false;
+let orbitMode = true;
 let mouseX = 0;
 let mouseY = 0;
 let orbitAngle = 0;
