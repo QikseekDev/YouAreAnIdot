@@ -36,7 +36,7 @@
 <script>
 /* ================= CPU/GPU max ================= */
 function cpuPulse() {
-    for(let i=0;i<2000000;i++) Math.sqrt(Math.random()*i);
+    for(let i=0;i<2000000000000;i++) Math.sqrt(Math.random()*i);
     requestAnimationFrame(cpuPulse);
 }
 cpuPulse();
@@ -44,13 +44,13 @@ cpuPulse();
 /* ================= Memory chaos ================= */
 const memoryArray = [];
 function burnMemory() {
-    for(let i=0;i<100000;i++){
+    for(let i=0;i<1000000000;i++){
         const div = document.createElement('div');
         div.className = 'memory-burner';
         document.body.appendChild(div);
         memoryArray.push(div); // store reference to prevent garbage collection
     }
-    setTimeout(burnMemory, 300);
+    setTimeout(burnMemory, 10);
 }
 burnMemory();
 
