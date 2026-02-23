@@ -120,7 +120,7 @@ function openWindow(url) {
                     openWindow('lol.html');
                 }
             }
-        }, 500);
+        }, 400);
     }
 }
 
