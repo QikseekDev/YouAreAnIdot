@@ -65,34 +65,43 @@ function proCreate() {
     }
 }
 
-let xOff = 80, yOff = 80;
 let xPos = 400, yPos = -100;
 let flagRun = 1;
 
-function newXlt() { xOff = -(Math.random() * 80 + 40); }
-function newXrt() { xOff =  (Math.random() * 80 + 40); }
-function newYup() { yOff = -(Math.random() * 80 + 40); }
-function newYdn() { yOff =  (Math.random() * 80 + 40); }
+// speed capped to max 40
+let xOff = randSpeed();
+let yOff = randSpeed();
 
-function playBall() {
-    xPos += xOff;
-    yPos += yOff;
+function randSpeed() {
+    const max = 40;
+    const s = Math.random() * max; // 0–40
+    return Math.random() < 0.5 ? -s : s;
+}
 
-    if (xPos > screen.width - 357) newXlt();
-    if (xPos < 0) newXrt();
-    if (yPos > screen.height - 330) newYup();
-    if (yPos < 0) newYdn();
+function newXlt() { xOff = -randSpeed(); }
+function newXrt() { xOff =  randSpeed(); }
+function newYup() { yOff = -randSpeed(); }
+function newYdn() { yOff =  randSpeed(); }
 
-    if (flagRun === 1) {
-        try {
-            window.moveTo(xPos, yPos);
-        } catch (e) {
-            flagRun = 0;
-            return;
-        }
+function playBall() {  
+    xPos += xOff;  
+    yPos += yOff;  
 
-        setTimeout(playBall, 1);
-    }
+    if (xPos > screen.width - 357) newXlt();  
+    if (xPos < 0) newXrt();  
+    if (yPos > screen.height - 330) newYup();  
+    if (yPos < 0) newYdn();  
+
+    if (flagRun === 1) {  
+        try {  
+            window.moveTo(xPos, yPos);  
+        } catch (e) {  
+            flagRun = 0;  
+            return;  
+        }  
+
+        setTimeout(playBall, 1);  
+    }  
 }
 
 window.onload = function () {
