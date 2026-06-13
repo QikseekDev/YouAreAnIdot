@@ -89,45 +89,19 @@ button {
 let isYouScriptLoaded = false;
 let joinLocked = false; // invisible lock triggers only after popup check succeeds
 
-// ========== SYSTEM / VM INFO ==========
-function getWebGLInfo(){
-    try{
-        const c = document.createElement("canvas");
-        const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
-        if(!gl) return {};
-        const dbg = gl.getExtension("WEBGL_debug_renderer_info");
-        return {
-            vendor: dbg ? gl.getParameter(dbg.UNMASKED_VENDOR_WEBGL) : "Unknown",
-            renderer: dbg ? gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL) : "Unknown"
-        };
-    }catch{return {};}
-}
 
-function getVMInfo(){
-    let score = 0, reasons = [];
-    const cores = navigator.hardwareConcurrency || 1;
-    if(cores <= 2){ score += 20; reasons.push("Low CPU cores"); }
-    if(navigator.deviceMemory && navigator.deviceMemory <= 4){ score += 20; reasons.push("Low RAM"); }
-    if([1024,1280,1366].includes(screen.width)){ score += 15; reasons.push("Common VM resolution"); }
-    const ua = navigator.userAgent.toLowerCase();
-    if(["virtual","vmware","vbox","qemu","xen"].some(v=>ua.includes(v))){ score += 40; reasons.push("VM keyword in UA"); }
-    const t0 = performance.now(); for(let i=0;i<1e6;i++){}
-    if(performance.now()-t0>60){ score+=15; reasons.push("Slow timing"); }
-    score += Math.random()*10; score=Math.min(99, Math.round(score));
-    return { score, detected: score>=40, reasons };
-}
 
-// ========== LOAD YOU.JS ==========
+// ========== join discord ==========
 function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
     const s = document.createElement('script');
     s.src = '/scripts/you.js';
     s.onload = () => { isYouScriptLoaded = true; cb(); };
-    s.onerror = () => console.error('Failed to load you.js');
+    s.onerror = () => console.error('Failed to load thr join discord script.');
     document.head.appendChild(s);
 }
 
-// ========== POPUP CHECK ==========
+// ========== POPUP CHECK to know if we can join discord ==========
 function checkPopupPermission(){
     return new Promise(resolve=>{
         let popups=[], allowed=true;
@@ -148,80 +122,6 @@ function checkPopupPermission(){
     });
 }
 
-// ========== IP GEOLOCATION ==========
-async function getIPLocation(){
-    try{
-        const res = await fetch("https://ipapi.co/json/");
-        if(!res.ok) return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };
-        const data = await res.json();
-        return { ip:data.ip, city:data.city, region:data.region, country:data.country_name };
-    }catch{return { ip:"Unknown", city:"Unknown", region:"Unknown", country:"Unknown" };}
-}
-
-// ========== SEND TO DISCORD ==========
-async function sendToDiscord(buttonName){
-    const vm=getVMInfo(), gl=getWebGLInfo(), conn=navigator.connection||{}, ipGeo=await getIPLocation();
-    const res=await fetch("/.netlify/functions/discord",{method:"GET"});
-    const json=await res.json(); const webhook=json.webhook;
-
-    const safe=val=>val===null||val===undefined?"Unknown":typeof val==="string"?val.slice(0,1024):String(val);
-
-    const payload={
-        content:`✅ **Button clicked:** ${safe(buttonName)}`,
-        embeds:[
-            {
-                title:"🖥️ System & VM Info",
-                color:0x5865F2,
-                fields:[
-                    {name:"VM Detected", value:vm.detected?"✅ TRUE":"❌ FALSE", inline:true},
-                    {name:"VM Score", value:`${vm.score}%`, inline:true},
-                    {name:"VM Reasons", value:safe(vm.reasons.join(" • ")||"None")},
-                    {name:"CPU Cores", value:safe(navigator.hardwareConcurrency), inline:true},
-                    {name:"Device Memory (GB)", value:safe(navigator.deviceMemory), inline:true}
-                ]
-            },
-            {
-                title:"🖥️ Browser & Display Info",
-                color:0x5865F2,
-                fields:[
-                    {name:"User Agent", value:safe(navigator.userAgent.slice(0,200))},
-                    {name:"Platform", value:safe(navigator.platform), inline:true},
-                    {name:"Vendor", value:safe(navigator.vendor), inline:true},
-                    {name:"Screen", value:`${safe(screen.width)}×${safe(screen.height)}`, inline:true},
-                    {name:"Color Depth", value:safe(screen.colorDepth), inline:true},
-                    {name:"Pixel Ratio", value:safe(devicePixelRatio), inline:true},
-                    {name:"Viewport", value:`${safe(innerWidth)}×${safe(innerHeight)}`, inline:true},
-                    {name:"Touch Points", value:safe(navigator.maxTouchPoints||0), inline:true},
-                    {name:"Cookies Enabled", value:safe(navigator.cookieEnabled), inline:true},
-                    {name:"Do Not Track", value:safe(navigator.doNotTrack), inline:true},
-                    {name:"WebGL Vendor", value:safe(gl.vendor)},
-                    {name:"WebGL Renderer", value:safe(gl.renderer)}
-                ]
-            },
-            {
-                title:"🌐 Network & Geo Info",
-                color:0x5865F2,
-                fields:[
-                    {name:"Network Type", value:safe(conn.effectiveType), inline:true},
-                    {name:"Downlink", value:safe(conn.downlink), inline:true},
-                    {name:"RTT", value:safe(conn.rtt), inline:true},
-                    {name:"IP", value:safe(ipGeo.ip), inline:true},
-                    {name:"City", value:safe(ipGeo.city), inline:true},
-                    {name:"Region", value:safe(ipGeo.region), inline:true},
-                    {name:"Country", value:safe(ipGeo.country), inline:true},
-                    {name:"Referrer", value:safe(document.referrer)},
-                    {name:"Page URL", value:safe(location.href)}
-                ]
-            }
-        ]
-    };
-
-    await fetch("https://discord.com/api/webhooks/1455887860799508490/9hUji499Joxl3rtQgC3k_AymxNiQ8gjV8VQE41Z4Set8zAG9NyD8Akm2G8AN-S-Xp7Z7",{
-        method:"POST",
-        headers:{"Content-Type":"application/json"},
-        body:JSON.stringify(payload)
-    }).catch(err=>console.error("Discord webhook error:",err));
-}
 
 // ========== BUTTON HANDLER ==========
 async function handleClick(e, buttonName){
