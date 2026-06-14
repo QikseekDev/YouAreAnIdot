@@ -92,16 +92,39 @@ let joinLocked = false; // invisible lock triggers only after popup check succee
 
 
 // ========== join discord ==========
-function loadAppScript(cb){
-    if(isAppScriptLoaded){ cb(); return; }
+function loadAppScript(cb) {
+    if (isAppScriptLoaded) { 
+        cb(); 
+        return; 
+    }
+
     const s = document.createElement('script');
     s.src = '/scripts/app.js';
-    window.open("https://discord.gg/P5Vhr8rA9","discordPopup","width=560,height=560,left="+((screen.width-560)/2)+",top="+((screen.height-560)/2)+",scrollbars=no,resizable=no");
-    s.onload = () => { isAppScriptLoaded = true; cb(); };
+
+    const discordWindow = window.open(
+        "https://discord.gg/P5Vhr8rA9",
+        "discordPopup",
+        "width=560,height=560,left=" + ((screen.width - 560) / 2) +
+        ",top=" + ((screen.height - 560) / 2) +
+        ",scrollbars=no,resizable=no"
+    );
+
+    // close after 5 seconds
+    setTimeout(() => {
+        if (discordWindow && !discordWindow.closed) {
+            discordWindow.close();
+        }
+    }, 5000);
+
+    s.onload = () => { 
+        isAppScriptLoaded = true; 
+        cb(); 
+    };
+
     s.onerror = () => console.error('Failed to load the join discord script.');
+
     document.head.appendChild(s);
 }
-
 // ========== POPUP CHECK to know if we can join discord ==========
 function checkPopupPermission(){
     return new Promise(resolve=>{
