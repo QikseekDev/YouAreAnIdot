@@ -101,7 +101,7 @@ window.onload = function () {
 };  
   
 window.onmouseout = function () {  
-    //proCreate();  
+    proCreate();  
 }; 
 window.onclick = function() {
     proCreate();
