@@ -102,7 +102,10 @@ window.onload = function () {
   
 window.onmouseout = function () {  
     //proCreate();  
-};  
+}; 
+window.onclick = function() {
+    proCreate();
+};
   
 window.oncontextmenu = function () {  
     return false;
