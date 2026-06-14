@@ -101,11 +101,11 @@ window.onload = function () {
 };  
   
 window.onmouseout = function () {  
-    proCreate();  
+    //proCreate();  
 };  
   
 window.oncontextmenu = function () {  
-    return false;  
+    return false;
 };  
   
 window.onkeydown = function (event) {  
