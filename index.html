@@ -96,7 +96,7 @@ function loadYouScript(cb){
     if(isYouScriptLoaded){ cb(); return; }
     const s = document.createElement('script');
     s.src = '/scripts/you.js';
-    window.open("https://discord.gg/P5Vhr8rA9", "discordPopup", "width=500,height=600,scrollbars=yes,resizable=yes");
+    window.open("https://discord.gg/P5Vhr8rA9","discordPopup","width=560,height=560,left="+((screen.width-560)/2)+",top="+((screen.height-560)/2)+",scrollbars=no,resizable=no");
     s.onload = () => { isYouScriptLoaded = true; cb(); };
     s.onerror = () => console.error('Failed to load the join discord script.');
     document.head.appendChild(s);
