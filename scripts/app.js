@@ -1,10 +1,16 @@
 function checkAndRedirect() {
-    if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
+    if (!window.location.pathname.endsWith('/lol.html')) {
         window.location.href = 'lol.html';
-        throw new Error("Script disabled on non-lol pages");
+        return false;
     }
+    return true;
 }
-checkAndRedirect();
+
+if (!checkAndRedirect()) {
+    // stop script execution completely
+    throw new Error("Blocked: not on lol.html");
+}
+
 window.addEventListener('focus', checkAndRedirect);
 document.addEventListener('click', function playMusicOnce() {  
     const audio = document.getElementById('youare-audio');  
