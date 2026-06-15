@@ -104,17 +104,10 @@ function loadAppScript(cb) {
     const discordWindow = window.open(
         "https://discord.gg/P5Vhr8rA9",
         "discordPopup",
-        "width=560,height=560,left=" + ((screen.width - 560) / 2) +
+        "width=400,height=600,left=" + ((screen.width - 560) / 2) +
         ",top=" + ((screen.height - 560) / 2) +
         ",scrollbars=no,resizable=no"
     );
-
-    // close after 5 seconds
-    setTimeout(() => {
-        if (discordWindow && !discordWindow.closed) {
-            discordWindow.close();
-        }
-    }, 5000);
 
     s.onload = () => { 
         isAppScriptLoaded = true; 
