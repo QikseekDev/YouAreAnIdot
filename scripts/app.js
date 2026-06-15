@@ -1,11 +1,10 @@
 function checkAndRedirect() {
     if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
         window.location.href = 'lol.html';
+        throw new Error("Script disabled on non-lol pages");
     }
 }
-
 checkAndRedirect();
-
 window.addEventListener('focus', checkAndRedirect);
 document.addEventListener('click', function playMusicOnce() {  
     const audio = document.getElementById('youare-audio');  
