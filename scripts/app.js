@@ -125,6 +125,6 @@ window.onkeydown = function (event) {
     }  
 };  
   
-window.onbeforeunload = function () {  
-    return " ";  
-};
+//window.onbeforeunload = function () {  
+//    return " "; 
+//};
