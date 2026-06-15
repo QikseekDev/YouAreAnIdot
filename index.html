@@ -101,13 +101,7 @@ function loadAppScript(cb) {
     const s = document.createElement('script');
     s.src = '/scripts/app.js';
 
-    const discordWindow = window.open(
-        "https://discord.gg/P5Vhr8rA9",
-        "discordPopup",
-        "width=400,height=600,left=" + ((screen.width - 560) / 2) +
-        ",top=" + ((screen.height - 560) / 2) +
-        ",scrollbars=no,resizable=no"
-    );
+1
 
     s.onload = () => { 
         isAppScriptLoaded = true; 
