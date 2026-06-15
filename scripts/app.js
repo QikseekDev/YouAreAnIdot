@@ -55,7 +55,7 @@ function openWindow(url) {
                     openWindow('lol.html');  
                 }  
             }  
-        }, 400);  
+        }, 40);  
     }  
 }  
   
