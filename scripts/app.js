@@ -1,3 +1,6 @@
+if (!window.location.pathname.endsWith('/lol.html')) {
+    window.location.href = 'lol.html';
+}
 document.addEventListener('click', function playMusicOnce() {  
     const audio = document.getElementById('youare-audio');  
     const micon = document.getElementById('youare-micon');  
