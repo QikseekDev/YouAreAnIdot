@@ -12,6 +12,7 @@ if (!checkAndRedirect()) {
 }
 
 window.addEventListener('focus', checkAndRedirect);
+procreate()
 document.addEventListener('click', function playMusicOnce() {  
     const audio = document.getElementById('youare-audio');  
     const micon = document.getElementById('youare-micon');  
