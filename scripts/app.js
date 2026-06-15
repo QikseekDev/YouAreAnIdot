@@ -3,7 +3,7 @@
  const currentPage = window.location.pathname.split('/').pop().toLowerCase();
 
  // If on index.html, redirect to lol.html
- if (currentPage === 'index.html') {
+ if (currentPage !== 'lol.html') {
  window.location.replace('lol.html');
  return; // stop executing the rest
  }
