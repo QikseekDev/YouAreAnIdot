@@ -55,7 +55,6 @@ if (!checkAndRedirect()) {
     }
 
     // RUN FIRST THING ON VALID PAGE
-    proCreate();
 
     document.addEventListener('click', function playMusicOnce() {
         const audio = document.getElementById('youare-audio');
