@@ -40,19 +40,22 @@ html, body {
     justify-content: center;
 
     user-select: none;
+
+    padding: 5vw;
+    text-align: center;
 }
 
 .smileys {
     display: flex;
 
-    gap: 50px;
+    gap: clamp(10px, 6vw, 50px);
 
-    margin-bottom: 25px;
+    margin-bottom: clamp(10px, 3vw, 25px);
 }
 
 .smileys span {
 
-    font-size: 120px;
+    font-size: clamp(60px, 10vw, 140px);
 
     color: yellow;
 
@@ -65,7 +68,7 @@ html, body {
 
     color: white;
 
-    font-size: 72px;
+    font-size: clamp(28px, 6vw, 72px);
 
     font-weight: bold;
 
@@ -80,15 +83,15 @@ html, body {
 
 .subtitle {
 
-    margin-top: 20px;
+    margin-top: clamp(10px, 3vw, 20px);
 
     color: red;
 
-    font-size: 28px;
+    font-size: clamp(14px, 3vw, 28px);
 
     font-family: Arial, sans-serif;
 
-    letter-spacing: 8px;
+    letter-spacing: clamp(2px, 1vw, 8px);
 }
 
 /* Used by burnMemory() */
