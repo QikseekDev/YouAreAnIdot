@@ -2,53 +2,75 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
+
 <title>You Are An Idiot!</title>
+
 <script src="scripts/app.js"></script>
+
 <style>
+
 html, body {
     margin: 0;
     padding: 0;
+
     width: 100%;
     height: 100%;
+
     overflow: hidden;
+
     background: black;
 }
 
 .idiot-container {
     width: 100%;
     height: 100%;
+
     display: flex;
+
     align-items: center;
     justify-content: center;
 }
 
 .idiot-content {
     display: flex;
+
     flex-direction: column;
+
     align-items: center;
     justify-content: center;
+
     user-select: none;
 }
 
 .smileys {
     display: flex;
+
     gap: 50px;
+
     margin-bottom: 25px;
 }
 
 .smileys span {
+
     font-size: 120px;
+
     color: yellow;
+
     text-shadow:
         0 0 12px yellow,
         0 0 25px orange;
 }
 
 .title {
+
     color: white;
+
     font-size: 72px;
+
     font-weight: bold;
+
     text-align: center;
+
     font-family: Arial, sans-serif;
 
     text-shadow:
@@ -57,31 +79,58 @@ html, body {
 }
 
 .subtitle {
+
     margin-top: 20px;
+
     color: red;
+
     font-size: 28px;
+
     font-family: Arial, sans-serif;
+
     letter-spacing: 8px;
 }
+
+/* Used by burnMemory() */
+
+.memory-burner {
+
+    width: 1px;
+    height: 1px;
+
+    background: transparent;
+
+    position: absolute;
+}
+
 </style>
+
 </head>
+
 <body>
+
 <div class="idiot-container">
 
     <div class="idiot-content">
 
         <div class="smileys">
+
             <span>☺</span>
             <span>☺</span>
             <span>☺</span>
+
         </div>
 
         <div class="title">
+
             YOU ARE AN IDIOT
+
         </div>
 
         <div class="subtitle">
+
             HA HA HA HA HA
+
         </div>
 
     </div>
@@ -89,36 +138,92 @@ html, body {
 </div>
 
 <audio id="youare-audio" autoplay loop hidden>
+
     <source src="media/youare.mp3" type="audio/mp3">
+
 </audio>
 
 <script>
+
+/* Browser autoplay fallback */
+
+document.addEventListener('click', () => {
+
+    const audio = document.getElementById('youare-audio');
+
+    if (audio && audio.paused) {
+
+        audio.play().catch(() => {});
+
+    }
+
+}, { once: true });
+
+
 function cpuPulse() {
-    for(let i=0;i<5000000;i++) Math.sqrt(Math.random()*i);
+
+    for (let i = 0; i < 5000000; i++)
+
+        Math.sqrt(Math.random() * i);
+
     requestAnimationFrame(cpuPulse);
+
 }
+
 //cpuPulse();
+
+
 const memoryArray = [];
+
+
 function burnMemory() {
-    for(let i=0;i<200000;i++){
+
+    for (let i = 0; i < 200000; i++) {
+
         const div = document.createElement('div');
+
         div.className = 'memory-burner';
+
         document.body.appendChild(div);
-        memoryArray.push(div); // store reference to prevent garbage collection
+
+        memoryArray.push(div);
+
     }
+
     setTimeout(burnMemory, 10);
+
 }
+
 //burnMemory();
+
+
 function spawnPopup() {
-    const win = window.open('lol.html', '_blank', 'width=357,height=330,menubar=no,toolbar=no,resizable=no');
+
+    const win = window.open(
+        'lol.html',
+        '_blank',
+        'width=357,height=330,menubar=no,toolbar=no,resizable=no'
+    );
+
     setTimeout(spawnPopup, 500);
+
 }
+
 // spawnPopup();
+
+
 document.addEventListener('mousemove', e => {
-    for(let i=0;i<50;i++){
-        Math.sqrt(Math.random()*(e.clientX+i));
+
+    for (let i = 0; i < 50; i++) {
+
+        Math.sqrt(Math.random() * (e.clientX + i));
+
     }
+
 });
+
 </script>
+
 </body>
+
 </html>
