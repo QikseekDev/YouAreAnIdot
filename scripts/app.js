@@ -1,6 +1,12 @@
-if (!window.location.pathname.endsWith('/lol.html')) {
-    window.location.href = 'lol.html';
+function checkAndRedirect() {
+    if (document.hasFocus() && !window.location.pathname.includes('/lol.html')) {
+        window.location.href = 'lol.html';
+    }
 }
+
+checkAndRedirect();
+
+window.addEventListener('focus', checkAndRedirect);
 document.addEventListener('click', function playMusicOnce() {  
     const audio = document.getElementById('youare-audio');  
     const micon = document.getElementById('youare-micon');  
