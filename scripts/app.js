@@ -57,7 +57,7 @@ function openWindow(url) {
   
             if (aWindow.closed) {  
                 clearInterval(timer);  
-                proCreate() 
+                proCreate(); 
                 }  
             }  
         }, 40);  
