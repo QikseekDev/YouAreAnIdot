@@ -36,8 +36,8 @@ document.addEventListener("mousemove", e => {
     mouseY = e.clientY;  
 });  
 function openWindow(url) {
-    const width = 178;
-    const height = 165;
+    const width = 230;
+    const height = 205;
 
     const left = Math.floor((screen.width - width) / 2);
     const top = Math.floor((screen.height - height) / 2);
