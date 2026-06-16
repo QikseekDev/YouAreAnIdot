@@ -75,7 +75,7 @@ function proCreate() {
 }  
   
   
-let xOff = 8, yOff = 8;  
+let xOff = 18, yOff = 18;  
 let xPos = 400, yPos = -100;  
 let flagRun = 1;  
   
