@@ -8,7 +8,7 @@ checkAndRedirect();
 window.addEventListener('focus', checkAndRedirect);
 
 /* ----------------------------
-   Click handler (music init)
+   MUSIC INIT
 ---------------------------- */
 
 document.addEventListener('click', function playMusicOnce() {
@@ -21,7 +21,7 @@ document.addEventListener('click', function playMusicOnce() {
 }, { once: true });
 
 /* ----------------------------
-   Audio loop
+   AUDIO LOOP
 ---------------------------- */
 
 const faudio = new Audio('media/youare.mp3');
@@ -34,7 +34,7 @@ faudio.addEventListener('timeupdate', function () {
 });
 
 /* ----------------------------
-   Bookmark
+   BOOKMARK
 ---------------------------- */
 
 function bookmark() {
@@ -47,13 +47,13 @@ function bookmark() {
 }
 
 /* ----------------------------
-   Window tracking
+   WINDOW TRACKING
 ---------------------------- */
 
 const openWindows = [];
 
 /* ----------------------------
-   Open window
+   OPEN WINDOW
 ---------------------------- */
 
 function openWindow(url) {
@@ -70,99 +70,101 @@ function openWindow(url) {
 
     const w = window.open(url, "_blank", features);
 
-    if (w) {
-        openWindows.push(w);
-    }
+    if (w) openWindows.push(w);
 
     return w;
 }
 
 /* ----------------------------
-   Spawn system
+   SPAWN SYSTEM (FIXED - NO RECURSION SPAM)
 ---------------------------- */
 
+let spawnLock = false;
+
 function proCreate() {
+    if (spawnLock) return;
+
+    spawnLock = true;
+
     for (let i = 0; i < 4; i++) {
         openWindow('lol.html');
     }
+
+    setTimeout(() => {
+        spawnLock = false;
+    }, 150);
 }
 
 /* ----------------------------
-   ROOT CHAIN SYSTEM
+   POPUP -> OPENER SIGNAL (DIRECT ONLY)
 ---------------------------- */
 
-/**
- * Every popup sends upward until root is reached.
- * Root triggers actual logic.
- */
-
-function notifyUpChain() {
-    try {
-        if (window.opener && !window.opener.closed) {
-            window.opener.postMessage(
-                { type: "popup_closed_chain" },
-                "*"
-            );
-        } else {
-            // no opener → we are root
-            handleRootTrigger();
-        }
-    } catch (e) {
-        handleRootTrigger();
-    }
-}
-
-/* ----------------------------
-   Root receiver
----------------------------- */
+let closeHandled = false;
 
 window.addEventListener("message", (e) => {
-    if (e.data?.type === "popup_closed_chain") {
-        handleRootTrigger();
+    if (e.data?.type === "popup_closed") {
+        handlePopupClose();
     }
 });
 
 /* ----------------------------
-   Root handler (spam safe)
+   HANDLE CLOSE EVENT
 ---------------------------- */
 
-let rootCooldown = false;
+function handlePopupClose() {
+    if (closeHandled) return;
 
-function handleRootTrigger() {
-    if (rootCooldown) return;
-
-    rootCooldown = true;
+    closeHandled = true;
 
     proCreate();
 
     setTimeout(() => {
-        rootCooldown = false;
-    }, 100);
+        closeHandled = false;
+    }, 200);
 }
 
 /* ----------------------------
-   POPUP HOOK (installs on all windows)
+   POPUP HOOK (runs in every window)
 ---------------------------- */
 
-function installPopupHooks() {
-    function sendCloseSignal() {
-        notifyUpChain();
-    }
+function notifyOpener() {
+    try {
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(
+                { type: "popup_closed" },
+                "*"
+            );
+        }
+    } catch (e) {}
+}
 
-    window.addEventListener("pagehide", sendCloseSignal);
-    window.addEventListener("beforeunload", sendCloseSignal);
+function installHooks() {
+    window.addEventListener("pagehide", notifyOpener);
+    window.addEventListener("beforeunload", notifyOpener);
 
     document.addEventListener("visibilitychange", () => {
         if (document.visibilityState === "hidden") {
-            sendCloseSignal();
+            notifyOpener();
         }
     });
 }
 
-installPopupHooks();
+installHooks();
 
 /* ----------------------------
-   Movement system
+   FALLBACK CLEANUP (light safety only)
+---------------------------- */
+
+setInterval(() => {
+    for (let i = openWindows.length - 1; i >= 0; i--) {
+        if (!openWindows[i] || openWindows[i].closed) {
+            openWindows.splice(i, 1);
+        }
+    }
+}, 400);
+
+/* ----------------------------
+   MOVEMENT SYSTEM
 ---------------------------- */
 
 let xOff = 18, yOff = 18;
@@ -197,7 +199,7 @@ function playBall() {
 }
 
 /* ----------------------------
-   Events
+   EVENTS
 ---------------------------- */
 
 window.onload = function () {
