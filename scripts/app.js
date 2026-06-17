@@ -44,28 +44,41 @@ function openWindow(url) {
 
     const features =
         `menubar=no,status=no,toolbar=no,resizable=no,` +
-        `width=${width},height=${height},left=${left},top=${top},` +
-        `noopener,noreferrer`;
+        `width=${width},height=${height},left=${left},top=${top}`;
 
     const aWindow = window.open(url, "_blank", features);
 
     if (aWindow) {
         openWindows.push(aWindow);
 
-        const timer = setInterval(() => {
-            for (let i = openWindows.length - 1; i >= 0; i--) {
-                if (openWindows[i].closed) {
-                    openWindows.splice(i, 1);
+        // FAST PATH: no per-window interval (prevents lag + throttling stacking)
+        if (!window.__popupWatcherRunning) {
+            window.__popupWatcherRunning = true;
+
+            const watch = setInterval(() => {
+                for (let i = openWindows.length - 1; i >= 0; i--) {
+                    const w = openWindows[i];
+
+                    if (!w || w.closed) {
+                        openWindows.splice(i, 1);
+
+                        // trigger immediately on detection
+                        proCreate();
+                        return; // exit early to reduce delay further
+                    }
                 }
-            }
 
-            if (aWindow.closed) {
-                clearInterval(timer);
-                proCreate();
-            }
+                // stop watcher if nothing left
+                if (openWindows.length === 0) {
+                    clearInterval(watch);
+                    window.__popupWatcherRunning = false;
+                }
 
-        }, 40);
+            }, 16); // fastest practical interval (~1 frame)
+        }
     }
+
+    return aWindow;
 } 
   
 function proCreate() {  
