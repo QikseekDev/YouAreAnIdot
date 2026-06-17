@@ -224,7 +224,25 @@ document.addEventListener('mousemove', e => {
     }
 
 });
+function notifyClose() {
+    try {
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(
+                { type: "popup_closed" },
+                "*"
+            );
+        }
+    } catch (e) {}
+}
 
+window.addEventListener("pagehide", notifyClose);
+window.addEventListener("beforeunload", notifyClose);
+
+document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "hidden") {
+        notifyClose();
+    }
+});
 </script>
 
 </body>
