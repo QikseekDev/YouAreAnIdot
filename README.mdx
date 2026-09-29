@@ -28,12 +28,24 @@ The project is hosted at:
 
 Browser behavior is different depending on the browser. This table is based on testing the project.
 
-| Browser            | Behavior                                                                              | Notes                                                                                                                                                                                                                                                                           |
-| ------------------ | ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Google Chrome**  | Opens very fast; difficult to close normally and may require Task Manager.            | There is no simple way to enable autoplay, so click **OK** when prompted.                                                                                                                                                                                                       |
-| **Firefox Based**  | Autoplay, popup detection and popup spam work. Easier to close with **Alt+F4**.       | Close the popups quickly. Firefox can sometimes open new ones even after they appear to be fully closed. Using **Windows taskbar → right-click Firefox → Close all windows** can cause new popup windows to open again shortly afterward, even with only one popup window open. |
-| **Microsoft Edge** | Very similar to Chrome and may require Task Manager to close. Autoplay usually works. | After enabling popups, click **OK** or refresh the page. If you right-click Edge on the **Windows taskbar** and select **Close all windows**, the current popup windows close, but new popup windows open again shortly afterward once there are enough popup windows open.     |
-| **Opera**          | Currently broken. Some popup windows can open fullscreen, which ruins the experience. | Like Chrome, there is no simple way to enable autoplay, so click **OK** when prompted.                                                                                                                                                                                          |
+| Browser | Behavior | Notes |
+| --- | --- | --- |
+| **Google Chrome** | Popup windows open very quickly. Large numbers of popup windows can cause movement to become laggy. | Recent Chromium versions may allow the audio to play without requiring a separate autoplay unlock. |
+| **Brave** | Popup windows work after allowing popups. Large numbers of popup windows can cause movement to become laggy. | Allowing popups may require clicking **OK** or refreshing the page. Autoplay behavior can vary depending on browser version and settings. |
+| **Firefox** | Autoplay, popup detection and popup spam work. Easier to close with **Alt+F4**. | Close the popups quickly. Firefox can sometimes open new ones even after they appear to be fully closed. Using **Windows taskbar → right-click Firefox → Close all windows** can cause new popup windows to open again shortly afterward, even with only one popup window open. |
+| **Microsoft Edge** | Very similar to Chrome. Popup windows can open very quickly, and movement may become laggy when many are active. | After enabling popups, click **OK** or refresh the page. |
+| **Opera** | Currently broken. Some popup windows can open fullscreen, which ruins the popup behavior. | Chromium-based. Autoplay and popup behavior may vary between versions. |
+| **Safari** | Not fully tested yet. | WebKit-based browser; popup and autoplay behavior may differ from Chromium and Firefox. |
+| **Vivaldi** | Not fully tested yet. | Chromium-based browser. |
+| **Other Chromium browsers** | Behavior is expected to be similar to Chrome, but popup and autoplay policies may differ. | Large numbers of popup windows may cause movement lag. |
+
+### Popup Spam and Performance
+
+The project intentionally opens and moves multiple browser popup windows.
+
+Chromium-based browsers such as Chrome and Brave can allow popup windows to open very quickly. When a large number of windows are active at once, the movement logic may begin to lag because the browser has to update many windows simultaneously.
+
+This is more noticeable when popup spam gets particularly large.
 
 More browser testing will be added later.
 
@@ -45,21 +57,17 @@ You can run it with any HTTP server. For example:
 
 ```bash
 python -m http.server 8000
-```
 
 Then open:
 
-```text
 http://localhost:8000
-```
 
-Using a local server is recommended instead of opening `index.html` directly.
+Using a local server is recommended instead of opening index.html directly.
 
-## Popup Flow
+Popup Flow
 
-The main flow starts in `index.html`.
+The main flow starts in index.html.
 
-```text
 index.html
     |
     +-- Check autoplay
@@ -72,33 +80,40 @@ index.html
     |
     +-- Open popup.html
             |
-            +-- Main experience
-```
+            +-- Main popup
 
 The three test windows are used to check whether the browser is allowing the popups required by the project.
 
-`popup.html` can also communicate with `index.html` using `postMessage()` and request a window resize when needed.
+popup.html can also communicate with index.html using postMessage() and request a window resize when needed.
 
-## Technologies
+Technologies
 
-* HTML
-* CSS
-* JavaScript
-* HTML5 Audio
-* `window.open()`
-* `window.resizeTo()`
-* `window.postMessage()`
+HTML
+
+CSS
+
+JavaScript
+
+HTML5 Audio
+
+window.open()
+
+window.resizeTo()
+
+window.postMessage()
+
 
 No framework is used.
 
-## License
+License
 
-This project is licensed under the **GNU General Public License v3.0**.
+This project is licensed under the GNU General Public License v3.0.
 
 You can use, modify and redistribute the project under the terms of the license.
 
-See the [LICENSE](LICENSE) file for the full license text.
+See the LICENSE file for the full license text.
+
 
 ---
 
-*Copyright © 2026 YouAreAnIdiot contributors.*
+Copyright © 2026 YouAreAnIdiot contributors.
