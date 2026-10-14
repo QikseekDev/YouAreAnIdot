@@ -456,9 +456,10 @@ document.addEventListener('mousemove', e => {
   if (dist < 110) {
     const dx = (cx - e.screenX) / (dist || 1);
     const dy = (cy - e.screenY) / (dist || 1);
+    const jump = Math.hypot(window.outerWidth, window.outerHeight); // scales with window size
     window.moveTo(
-      Math.min(Math.max(window.screenX + dx * 150, 0), screen.availWidth - window.outerWidth),
-      Math.min(Math.max(window.screenY + dy * 150, 0), screen.availHeight - window.outerHeight)
+      Math.min(Math.max(window.screenX + dx * jump, 0), screen.availWidth - window.outerWidth),
+      Math.min(Math.max(window.screenY + dy * jump, 0), screen.availHeight - window.outerHeight)
     );
   }
 });
