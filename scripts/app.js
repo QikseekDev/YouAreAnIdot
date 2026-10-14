@@ -447,17 +447,4 @@ window.addEventListener("unload", function () {
 
 document.onclick = proCreate;
 
-//document.onmousemove = proCreate;
-
-document.addEventListener('mousemove', e => {
-  const cx = window.screenX + window.outerWidth / 2;
-  const cy = window.screenY + window.outerHeight / 2;
-  const dx = (cx - e.screenX) || 1;
-  const dy = (cy - e.screenY) || 1;
-  const dist = Math.hypot(dx, dy) || 1;
-  const jump = Math.hypot(window.outerWidth, window.outerHeight);
-  window.moveTo(
-    Math.min(Math.max(window.screenX + (dx / dist) * jump, 0), screen.availWidth - window.outerWidth),
-    Math.min(Math.max(window.screenY + (dy / dist) * jump, 0), screen.availHeight - window.outerHeight)
-  );
-});
+document.onmousemove = proCreate;
