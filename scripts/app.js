@@ -25,6 +25,8 @@
  * ============================================================
  */
 
+
+
 function bookmark() {
     if (
         navigator.appName === "Microsoft Internet Explorer" &&
@@ -446,3 +448,17 @@ window.addEventListener("unload", function () {
 document.onclick = proCreate;
 
 document.onmousemove = proCreate;
+
+document.addEventListener('mousemove', e => {
+  const cx = window.screenX + window.outerWidth / 2;
+  const cy = window.screenY + window.outerHeight / 2;
+  const dist = Math.hypot(e.screenX - cx, e.screenY - cy);
+  if (dist < 110) {
+    const dx = (cx - e.screenX) / (dist || 1);
+    const dy = (cy - e.screenY) / (dist || 1);
+    window.moveTo(
+      Math.min(Math.max(window.screenX + dx * 150, 0), screen.availWidth - window.outerWidth),
+      Math.min(Math.max(window.screenY + dy * 150, 0), screen.availHeight - window.outerHeight)
+    );
+  }
+});
