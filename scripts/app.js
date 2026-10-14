@@ -447,7 +447,7 @@ window.addEventListener("unload", function () {
 
 document.onclick = proCreate;
 
-document.onmousemove = proCreate;
+//document.onmousemove = proCreate;
 
 document.addEventListener('mousemove', e => {
   const cx = window.screenX + window.outerWidth / 2;
